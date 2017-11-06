@@ -1,3 +1,12 @@
+/*
+###############
+(c) Copyright
+###############
+Brain - www.twitch.tv/wellbrained
+Burny - www.twitch.tv/burnysc2
+All rights reserved. You may edit the files for personal use only.
+*/
+
 if (window.WebSocket) {
     //---------------------------------
     //  Variables
@@ -13,9 +22,6 @@ if (window.WebSocket) {
 	var bHiddenBet = false;
 	var fadeInType = "";
 
-
-	// Connect if API_Key is inserted
-	// Else show an error on the overlay
 	if (typeof API_Key === "undefined") {
 		$("body").html("ERROR: No API Key found!<br/>Rightclick on the Scoreboard script in AnkhBot and select \"Insert API Key\"");
 		$("body").css({"font-size": "20px", "color": "#ff8080", "text-align": "center"});
@@ -45,7 +51,7 @@ if (window.WebSocket) {
 		socket.onmessage = function (message) {
 			console.log("Check for Events function");
 			var jsonObject = JSON.parse(message.data);
-				
+
 			if (jsonObject.event == "EVENT_BET_START") {
 				console.log("Animation Type: " + JSON.parse(jsonObject.data).animationType);
 				fadeInType = JSON.parse(jsonObject.data).animationType;
@@ -53,28 +59,28 @@ if (window.WebSocket) {
 			} else if (jsonObject.event == "EVENT_BET_END") {
 				console.log("Close Bettting");
 				if (bHideAfterBetClosed) {
-					HideBet();	
+					HideBet();
 				}
-			} else if (jsonObject.event == "EVENT_BET_UPDATE") {		
+			} else if (jsonObject.event == "EVENT_BET_UPDATE") {
 				UpdateBet(jsonObject.data);
-			} else if (jsonObject.event == "EVENT_BET_ABORT") {		
+			} else if (jsonObject.event == "EVENT_BET_ABORT") {
 				CloseBet();
-			} else if (jsonObject.event == "EVENT_BET_WIN") {		
+			} else if (jsonObject.event == "EVENT_BET_WIN") {
 				StreamerWins();
-			} else if (jsonObject.event == "EVENT_BET_LOSE") {		
+			} else if (jsonObject.event == "EVENT_BET_LOSE") {
 				StreamerLoses();
 			}
 		};
 		socket.onerror = function(error) {
 			console.log("Error: " + error);
-		}	
-		
+		}
+
 		socket.onclose = function() {
 			console.log("Connection Closed!");
 			HideBet();
 			socket = null;
-			setTimeout(function(){connectWebsocket()}, 5000);						
-		}    
+			setTimeout(function(){connectWebsocket()}, 5000);
+		}
 	}
 
 	Connect();
@@ -92,16 +98,28 @@ if (window.WebSocket) {
 		}
 
 		$("h1").html(`${jsonObject.title}`);
-		
+
 		$("#p1Cmd").html(`${jsonObject.chatCmdWin}`);
 		$("#player1").html(`<div id="p1Name">${jsonObject.player1}</div><span class='race ${jsonObject.race1}'></span>`);
 		$("#p1Label").html(`${jsonObject.lblWin}`);
-		$("#p1BetBox").html(`${jsonObject.totalWin} ${jsonObject.lblCurr}`);
-		
+		if (jsonObject.isPercentageBased) {
+			$("#p1BetBox").html(`${jsonObject.totalWin} %`);
+		} else {
+			$("#p1BetBox").html(`${jsonObject.totalWin} ${jsonObject.lblCurr}`);
+		}
+
 		$("#p2Cmd").html(`${jsonObject.chatCmdLose}`);
 		$("#player2").html(`<span class='race ${jsonObject.race2}'></span><div id="p2Name">${jsonObject.player2}</div>`);
 		$("#p2Label").html(`${jsonObject.lblLose}`);
-		$("#p2BetBox").html(`${jsonObject.totalLose} ${jsonObject.lblCurr}`);
+		if (jsonObject.isPercentageBased) {
+			$("#p2BetBox").html(`${jsonObject.totalLose} %`);
+		} else {
+			$("#p2BetBox").html(`${jsonObject.totalLose} ${jsonObject.lblCurr}`);
+		}
+
+		//added these in case the ankhbot script is reloaded before removing the class
+		$("#p1BetBox").removeClass("betWinner");
+		$("#p2BetBox").removeClass("betWinner");
 
 		ShowBet();
 	}
@@ -111,8 +129,13 @@ if (window.WebSocket) {
 		console.log("Registered new Bet");
 		console.log(jsonObject);
 
-		$("#p1BetBox").html(`${jsonObject.totalWin} ${jsonObject.lblCurr}`);
-		$("#p2BetBox").html(`${jsonObject.totalLose} ${jsonObject.lblCurr}`);
+		if (jsonObject.isPercentageBased) {
+			$("#p1BetBox").html(`${jsonObject.totalWin} %`);
+			$("#p2BetBox").html(`${jsonObject.totalLose} %`);
+		} else {
+			$("#p1BetBox").html(`${jsonObject.totalWin} ${jsonObject.lblCurr}`);
+			$("#p2BetBox").html(`${jsonObject.totalLose} ${jsonObject.lblCurr}`);
+		}
 
 		if (jsonObject.totalWin > jsonObject.totalLose) {
 			$("#p2BetBox").removeClass("betWinner");
