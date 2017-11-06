@@ -30,15 +30,45 @@ replayFile = os.path.join(path, "Odyssey.SC2Replay")
 replay = sc2reader.load_replay(replayFile, load_map=False)
 
 # find streamer in the replay
-for x in replay.players:
+for player in replay.players:
     # toon_id == 0 if that player is a computer
-    if x.toon_id == int(playerName.split("-")[-1]):
-        player = x
+    if player.toon_id == int(playerName.split("-")[-1]):
+        streamer = player
         break
 
 # if streamer is in this replay: print result and avg apm
-if player:
-    print("Streamer's result of this replay is: " + str(player.result))
-    print(player.avg_apm)
+if streamer:
+    print("Streamer's result of this replay is: " + str(streamer.result))
+    print(streamer.avg_apm)
 else:
     print("Streamer has not been found in this replay.")
+
+print(2 / 0)
+
+"""
+wichtige sachen kappa:
+- spielernamen
+- rassen
+- win loss
+- map name
+- server (eu / na)
+- avg apm
+- avg unspent resources
+- game duration
+- toon ID
+- game type: custom / unranked / ranked
+- - replay.is_ladder
+- - replay.is_private
+- - replay.game_type
+- game mode: 1v1 or 2v2
+- date played
+- which season played in
+- hero unit
+- supply blocked time
+[- constant scv production]
+- league (e.g. master vs diamond)
+
+- streaming session (date / time)
+
+
+"""
