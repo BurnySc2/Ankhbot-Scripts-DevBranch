@@ -38,6 +38,11 @@ Don't forget to enable the checkbox "betting system active" and then the betting
 Version History
 ###############
 
+1.1.3
+  ~ Fixed issue where both players had a name found in the list of "StarCraft II Accounts"
+  ~ In case users enter wrong StarCraft Names (like with trailing white space or with character code, e.g. Burny#1337), it will now automatically correct them
+  ~ Renamed "StarCraft II Accounts" to "Player Names"
+
 1.1.2
   ~ Added dev options - testing overlay vs AI and multiple entries
   ~ Added Voting system (either without currency or with currency and a fixed amount)

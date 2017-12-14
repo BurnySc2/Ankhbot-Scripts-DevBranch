@@ -27,7 +27,7 @@ ScriptName = "SCII - Betting System"
 Website = "https://www.brains-world.eu"
 Description = "Automatic Betting System for StarCraft II"
 Creator = "Brain & Burny"
-Version = "1.1.2"
+Version = "1.1.3"
 
 #---------------------------------------
 #	Set Variables
@@ -55,6 +55,7 @@ bets = {
 	"timeSinceLastUpdate": time.time(),
 	"recentlyJoinedUsers": [],
 	"noBetsOnlyVotes": False,
+	"duplicateNamesFound": False,
 }
 raceLongName = {
 	"Z": "zerg",
@@ -83,12 +84,14 @@ def Init():
 		"$maxBet": settings["maxBet"],
 		"$fixedAmount": settings["fixedVotingAmount"],
 	}
+	# automatically fixes the issue of trailing whitespace
+	# TODO: when users enter their character code, e.g. burny#1337
 	settings["streamerUsernames"] = []
-	settings["streamerUsernames"].append(settings["bnetUsername1"].lower())
-	settings["streamerUsernames"].append(settings["bnetUsername2"].lower())
-	settings["streamerUsernames"].append(settings["bnetUsername3"].lower())
-	settings["streamerUsernames"].append(settings["bnetUsername4"].lower())
-	settings["streamerUsernames"].append(settings["bnetUsername5"].lower())
+	settings["streamerUsernames"].append(settings["bnetUsername1"].lower().strip())
+	settings["streamerUsernames"].append(settings["bnetUsername2"].lower().strip())
+	settings["streamerUsernames"].append(settings["bnetUsername3"].lower().strip())
+	settings["streamerUsernames"].append(settings["bnetUsername4"].lower().strip())
+	settings["streamerUsernames"].append(settings["bnetUsername5"].lower().strip())
 
 	responseVariables["$totalAmountGambled"] = 0
 	responseVariables["$totalPointsWon"] = "0"
@@ -298,7 +301,15 @@ def Tick():
 		bets["timeSinceLastUpdate"] = time1
 		if bets["apiCallDone"]:
 			bets["apiCallDone"] = False
-			if apiData["inStarcraftLocation"] == "1v1AsPlayer" and int(apiData["ingameSecs"]) < 30 and bets["status"] == "reset":
+
+			# this "if" triggers when two names were found, then it sends the script into a status="duplicateNamesFound" and stays there until the streamers goes back to the menu
+			if bets["duplicateNamesFound"] and bets["status"] == "reset" and apiData["inStarcraftLocation"] in ["1v1AsPlayer", "1v1AsCaster", "1v1Replay"]:
+				# if duplicate names have been found, instantly close the bet system - no overlay will show up
+				# SendMessage("Loc: {}, P1: {}, P2: {}, duplicate: {}".format(apiData["inStarcraftLocation"], apiData["player1Name"].lower(), apiData["player2Name"].lower(), bets["duplicateNamesFound"]))
+				SendMessage(settings["responseTwoMatchingNames"])
+				bets["status"] = "duplicateNamesFound"
+
+			elif apiData["inStarcraftLocation"] == "1v1AsPlayer" and int(apiData["ingameSecs"]) < 30 and bets["status"] == "reset":
 				# resetting all local variables to default values and preparing for a new game, might have to put this into a function instead
 				bets["status"] = "open"
 				bets["bets"] = []
@@ -326,12 +337,20 @@ def Tick():
 				PushData("start")
 
 			elif int(apiData["ingameSecs"]) > int(settings["betDuration"]) and bets["status"] == "open":
+				# closing the bet because the in-game time passed the betDuration
 				bets["status"] = "closed"
 				PushData("end")
 				SendMessage(settings["responseBetClosed"])
 
-			elif apiData["player1Result"] != "undecided" and bets["status"] in ["closed", "open", "abort"] and apiData["inStarcraftLocation"] == "menu":
-				if int(apiData["ingameSecs"]) < int(settings["betDuration"]) or bets["status"] == "abort":
+			elif apiData["player1Result"] != "undecided" and bets["status"] in ["closed", "open", "abort", "duplicateNamesFound"] and apiData["inStarcraftLocation"] == "menu":	
+
+				if bets["status"] == "duplicateNamesFound":
+					# if previously both player names are in the list of usernames same as the streamer, no bets will be paid out and the script returns to its starting state
+					bets["status"] = "reset"
+					bets["duplicateNamesFound"] = False
+					
+				elif int(apiData["ingameSecs"]) < int(settings["betDuration"]) or bets["status"] == "abort":
+					# cancels the bets
 					for bet in bets["bets"]: # paying back viewers who already placed a bet if the game ended before "betDuration" ran out or when the abort command was used
 						Parent.AddPoints(bet["username"], bet["betInvestment"])
 					bets["bets"] = []
@@ -340,6 +359,7 @@ def Tick():
 					SendMessage(settings["responseBetCanceled"])
 
 				elif bets["status"] != "abort":
+					# paying out the correct bets
 					totalPointsWon = 0
 					totalPointsLost = 0
 					userListCorrectGamble = []
@@ -393,7 +413,8 @@ def Tick():
 							else:
 								SendMessage(settings["responseDefeatCorrectBets"])
 				bets["status"] = "reset"
-		threading.Thread(target=GetSc2ApiResponse, args=()).start()
+		else:
+			threading.Thread(target=GetSc2ApiResponse, args=()).start()
 	return
 
 def SendMessage(string):
@@ -448,9 +469,12 @@ def ProcessClientApiData(gameResponse, uiResponse):
 						apiData["streamerIsInValid1v1Game"] = False
 			else:
 				apiData["streamerIsInValid1v1Game"] = False
+			# both names (streamer and his opponent) have a username that is in the list of usernames of the streamer (e.g. this can be the case when both have the same barcodes)
 			if apiData["player1Name"].lower() in settings["streamerUsernames"] and apiData["player2Name"].lower() in settings["streamerUsernames"] :
 				apiData["streamerIsInValid1v1Game"] = False
-				SendMessage(settings["responseTwoMatchingNames"])
+				bets["duplicateNamesFound"] = True
+			else:
+				bets["duplicateNamesFound"] = False
 			matchup = apiData["player1Race"] + "v" + apiData["player2Race"]
 
 			if apiData["streamerIsInValid1v1Game"]:
@@ -459,6 +483,8 @@ def ProcessClientApiData(gameResponse, uiResponse):
 				responseVariables["$race1"] = apiData["player1Race"]
 				responseVariables["$race2"] = apiData["player2Race"]
 
+			# only change the location variable if duplicate names haven't been found
+			# if not bets["duplicateNamesFound"]:
 			if uiResponse["activeScreens"] == []:
 				if len(gameResponse["players"]) == 2:
 					if gameResponse["isReplay"]:

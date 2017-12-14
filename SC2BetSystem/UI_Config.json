@@ -92,35 +92,35 @@ IMPORTANT: Don't forget to change the response messages and overlay settings (e.
         "value": "",
         "label": "Name of Account #1",
         "tooltip": "Name of your StarCraft II nickname (For each region and no Bnet ID e.g. Brain#1337). \r\n Example: Brain",
-        "group": "StarCraft II Accounts"
+        "group": "Player Names"
     },
     "bnetUsername2": {
         "type": "textbox",
         "value": "",
         "label": "Name of Account #2",
         "tooltip": "Name of your StarCraft II nickname (For each region and no Bnet ID e.g. Burny#1338). \r\n Example: Burny",
-        "group": "StarCraft II Accounts"
+        "group": "Player Names"
     },
     "bnetUsername3": {
         "type": "textbox",
         "value": "",
         "label": "Name of Account #3",
         "tooltip": "Name of your StarCraft II nickname (For each region and no Bnet ID).",
-        "group": "StarCraft II Accounts"
+        "group": "Player Names"
     },
     "bnetUsername4": {
         "type": "textbox",
         "value": "",
         "label": "Name of Account #4",
         "tooltip": "Name of your StarCraft II nickname (For each region and no Bnet ID).",
-        "group": "StarCraft II Accounts"
+        "group": "Player Names"
     },
     "bnetUsername5": {
         "type": "textbox",
         "value": "",
         "label": "Name of Account #5",
         "tooltip": "Name of your StarCraft II nickname (For each region and no Bnet ID).",
-        "group": "StarCraft II Accounts"
+        "group": "Player Names"
     },
 
     "responseBetOpened": {
@@ -132,7 +132,7 @@ IMPORTANT: Don't forget to change the response messages and overlay settings (e.
     },
     "responseBetClosed": {
         "type": "textbox",
-        "value": "Countdown ended. Betting is now closed.",
+        "value": "Countdown has ended. Betting has now closed.",
         "label": "Bet has closed",
         "tooltip": "Notification message when the new bet has closed.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).",
         "group": "Responses"
@@ -230,9 +230,9 @@ IMPORTANT: Don't forget to change the response messages and overlay settings (e.
     },
     "responseTwoMatchingNames": {
         "type": "textbox",
-        "value": "Bet has failed to start because both players are in $mychannel's list of StarCraft usernames.",
+        "value": "Bet has failed to start because both players are in $mychannel's list of StarCraft player names.",
         "label": "Both names are found in the SC2 Accounts",
-        "tooltip": "Message when both players have the same name or the opponent has a name from your StarCraft II Accounts list.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).",
+        "tooltip": "Message when both players have the same name or the opponent has a name from your Player Names list.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).",
         "group": "Responses"
     },
 
