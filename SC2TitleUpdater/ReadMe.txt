@@ -6,7 +6,7 @@ Description: Automatic Title Updater for the Game StarCraft II
 Created by: 
 Brain - www.twitch.tv/wellbrained
 Burny - www.twitch.tv/burnysc2
-Version: 1.0.0
+Version: 1.0.1
 
 
 ################
@@ -44,6 +44,9 @@ Don't forget to enable the checkbox "Enable Stream Title Changes" and then the t
 ###############
 Version History
 ###############
+
+1.0.1:
+  ~ using regex to get MMR from RankedFTW now
 
 1.0.0:
   ~ First Release version
