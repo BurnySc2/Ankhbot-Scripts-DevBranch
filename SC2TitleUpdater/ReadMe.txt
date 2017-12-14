@@ -47,6 +47,8 @@ Version History
 
 1.0.1:
   ~ using regex to get MMR from RankedFTW now
+  ~ renamed "StarCraft Accounts" to "player names"
+  ~ also added buttons that take you directly to your app creation in twitch
 
 1.0.0:
   ~ First Release version
