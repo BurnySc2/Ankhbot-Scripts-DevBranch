@@ -74,7 +74,7 @@ def Init():
 		settings = json.load(file, encoding='utf-8-sig')
 
 	responseVariables = {
-		"$mychannel": Parent.GetChannelName(),
+		"$mychannel": Parent.GetDisplayName(Parent.GetChannelName()),
 		"$currencyName": Parent.GetCurrencyName(),
 		"$cmdBetWin": settings["cmdBetWin"],
 		"$cmdBetLose": settings["cmdBetLose"],
@@ -204,7 +204,7 @@ def Execute(data):
 	global settings, bets, responseVariables
 
 	if data.IsChatMessage():
-		responseVariables["$user"] = data.User
+		responseVariables["$user"] = Parent.GetDisplayName(data.User)
 		responseVariables["$points"] = str(Parent.GetPoints(data.User))
 
 		if data.GetParamCount() == 1 and data.GetParam(0).lower() == settings["cmdAbort"]:
