@@ -1,0 +1,131 @@
+﻿{
+    "output_file": "TTSqueue.json",
+
+    "clearQueue": {
+        "type": "button",
+        "label": "Clear Queue",
+        "tooltip": "Clears the text to speech queue in case someone spammed your queue.",
+        "function": "ClearQueue",
+        "wsevent": "",
+        "group": ""
+    },
+    "command": {
+        "type": "textbox",
+        "value": "!tts",
+        "label": "TTS command",
+        "tooltip": "",
+        "group": ""
+    },
+    "modsAllowedToUse": {
+        "type": "checkbox",
+        "value": false,
+        "label": "Only mods allowed to use TTS",
+        "tooltip": "Enable this Checkbox if you only want mods to be able to trigger TTS messages.",
+        "group": ""
+    },
+    "userCooldown": {
+        "type": "numberbox",
+        "value": 1,
+        "label": "User Cooldown (seconds)",
+        "tooltip": "How many seconds a user has to wait until he is allowed to us the TTS command again.",
+        "group": ""
+    },
+    "userMaxQueues": {
+        "type": "numberbox",
+        "value": 3,
+        "label": "Max Queues per User",
+        "tooltip": "How many TTS queues a user is allowed to have active.\r\nE.g. if this value is at 5, it means the user has to wait until his first TTS is played until he is allowed to queue another one.",
+        "group": ""
+    },
+    "userMaxMessageLength": {
+        "type": "numberbox",
+        "value": 270,
+        "label": "TTS Message Length",
+        "tooltip": "How many characters are allowed per TTS message?\r\nAlthough Twitch messages have a limit of 500 characters, it seems that text-to-speech only works on up to 270 characters.\r\nHighest Limit: 270 characters",
+        "group": ""
+    },
+    "volume": {
+        "type": "numberbox",
+        "value": 25,
+        "label": "Audio Volume 0-100",
+        "tooltip": "",
+        "group": ""
+    },
+    "userPointsCost": {
+        "type": "numberbox",
+        "value": 0,
+        "label": "Cost to trigger TTS",
+        "tooltip": "How many points will be subtracted when a user uses the TTS command.",
+        "group": ""
+    },    
+    "enableHelpCommand": {
+        "type": "checkbox",
+        "value": true,
+        "label": "Enable !ttshelp",
+        "tooltip": "Enables the \"!ttshelp\" command for everyone. If disabled, only the broadcaster can use the command.",
+        "group": ""
+    },
+    "defaultVoice": {
+        "type": "textbox",
+        "value": "US English Female",
+        "label": "Default Voice !tts",
+        "tooltip": "Default voice if only command (e.g. \"!tts hello\") was used.\r\nThe default language was \"US English Female\".",
+        "group": ""
+    },
+    "randomKey": {
+        "type": "textbox",
+        "value": "",
+        "label": "Unique Key",
+        "tooltip": "This acts as a \"secret key\" to trigger your TTS messages.\r\nIf you notice that a TTS goes off that wasn't triggered in your channel, change your key!\r\nIt means that someone else is using this key (on purpose or accidently) to trigger messages in your stream.\r\nSo make sure your key is unique!",
+        "group": "Unique Key (Hidden)"
+    },
+    "responseKeyMissing": {
+        "type": "textbox",
+        "value": "Streamlabs TTS Queue: It looks like the $streamer hasn't set up the Unique Key value yet. TTS will not be useable.",
+        "label": "Unique Key Missing",
+        "tooltip": "",
+        "group": "Error Responses"
+    },
+    "responseNotEnoughPoints": {
+        "type": "textbox",
+        "value": "@$user you don't seem to have enough points.",
+        "label": "Not enough Points",
+        "tooltip": "",
+        "group": "Error Responses"
+    },
+    "responseMessageTooLong": {
+        "type": "textbox",
+        "value": "@$user your message is longer than the character limit ($characterLimit).",
+        "label": "Message Too Long",
+        "tooltip": "",
+        "group": "Error Responses"
+    },
+    "responseUserSpamming": {
+        "type": "textbox",
+        "value": "@$user you have to wait $waitSeconds seconds",
+        "label": "TTS use too often",
+        "tooltip": "",
+        "group": "Error Responses"
+    },
+    "responseUserNotEnoughPoints": {
+        "type": "textbox",
+        "value": "@$user you need $pointCost $currencyName but only have $userPoints $currencyName.",
+        "label": "Not enough Points",
+        "tooltip": "",
+        "group": "Error Responses"
+    },
+    "responseUserLanguageNotFound": {
+        "type": "textbox",
+        "value": "@$user language hasn't been found!",
+        "label": "Language not found",
+        "tooltip": "",
+        "group": "Error Responses"
+    },
+    "responseUserTooManyInQueue": {
+        "type": "textbox",
+        "value": "@$user you have reached the limit of $maxQueue queue entries.",
+        "label": "Too many TTS in queue",
+        "tooltip": "",
+        "group": "Error Responses"
+    }
+}
