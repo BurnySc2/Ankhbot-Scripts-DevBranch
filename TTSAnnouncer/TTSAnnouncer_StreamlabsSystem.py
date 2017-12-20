@@ -14,18 +14,26 @@ import codecs
 #---------------------------------------
 #	[Required]	Script Information
 #---------------------------------------
-ScriptName = "TTS Queue"
+ScriptName = "TTS Announcer"
 Website = "https://burnysc2.github.io"
 Creator = "Brain & Burny"
-Version = "1.0.0"
+Version = "1.0.1"
 Description = "Text-to-Speech Queue"
 # Description = "Uses https://warp.world/scripts/tts-message to generate text-to-speech.\n\rSince there is no option to queue TTS commands, I made a script for it."
 
 #---------------------------------------
 #	Set Variables
 #---------------------------------------
-configFile = "TTSqueue.json"
+configFile = "TTSAnnouncer.json"
 users = {}
+
+convertPowerLevelToInt = {
+	"Everyone": 0,
+	"Regular": 1,
+	"Sub": 2,
+	"Mod": 3,
+	"Streamer": 4,
+}
 
 responseVariables = {
 	"$user": "", # user name
@@ -77,7 +85,7 @@ voices = {  # https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
 	"mk": "Macedonian Male",
 	"ro": "Moldavian Male",
 	"mo": "Montenegrin Male",
-	#"no": "Norwegian Female", # disabled because it was super loud compared to the other voices
+	"no": "Norwegian Female", # disabled because it was super loud compared to the other voices
 	"pl": "Polish Female",
 	"pt": "Portuguese Female",
 	"ro": "Romanian Male",
@@ -104,30 +112,39 @@ voices = {  # https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
 
 
 def Init():
-	global settings, voices, responseVariables
+	global settings, voices, responseVariables, convertPowerLevelToInt
 	path = os.path.dirname(__file__)
 
 	with codecs.open(os.path.join(path, configFile), encoding='utf-8-sig', mode='r') as file:
 		settings = json.load(file, encoding='utf-8-sig')
 	settings.update({
-		"messageColor": "FFFD32",
-		"fontColor": "FFFFFF",
-		"fontSize": "13",
-		"fontOutlineColor": "FFFFFF",
+		"messageColor": "ffffff",
+		"fontColor": "4141f4",
+		"fontSize": "32",
+		"fontOutlineColor": "42f47d",
 		"googleFont": "Roboto",
-		"defaultVoice": "US English Female",
+		# "defaultVoice": "US English Female",
 		"playAlert": "false",
 	})
 	voices[""] = settings["defaultVoice"]
 	settings["randomKey"] = settings["randomKey"].strip() #removes whitespace left and right
+	settings["powerLevelInt"] = convertPowerLevelToInt[settings["minPowerLevel"]]
+	# settings["userPointsCost"] = max(0, settings["userPointsCost"])
+	# settings["userCooldown"] = max(0, settings["userCooldown"])
+	# settings["userMaxQueues"] = max(0, settings["userMaxQueues"])
+
+	settings["enabledVoices"] = {"": settings["defaultVoice"]}
+	for key, value in voices.items():
+		if settings.get("language" + key, False):
+			settings["enabledVoices"][key] = value
 
 	responseVariables["$streamer"] = Parent.GetDisplayName(Parent.GetChannelName())
 	responseVariables["$currencyName"] = Parent.GetCurrencyName()
 	responseVariables["$pointsCost"] = settings["userPointsCost"]
-	responseVariables["$pointsCost"] = settings["userPointsCost"]
 	responseVariables["$maxQueue"] = settings["userMaxQueues"]
 	responseVariables["$waitSeconds"] = settings["userCooldown"]
 	responseVariables["$characterLimit"] = settings["userMaxMessageLength"]
+	responseVariables["$helpCommand"] = settings["helpCommand"]
 		
 	return
 
@@ -144,75 +161,99 @@ def ReloadSettings(jsonData):
 def Execute(data):
 	global tts, settings
 	
-	if settings["enabledTTS"]:
-		if data.IsChatMessage():
-			responseVariables["$user"] = Parent.GetDisplayName(data.User)
-			responseVariables["$userPoints"] = Parent.GetPoints(data.User)
+	# if settings["enabledTTS"]:
+	if data.IsChatMessage():
+		responseVariables["$user"] = Parent.GetDisplayName(data.User)
+		responseVariables["$userPoints"] = Parent.GetPoints(data.User)
+		
+		messagesOfUser = [x for x in tts["queue"] if data.User == x["user"]]
+
+		responseVariables["$userQueueEntries"] = len(messagesOfUser)
+
+		
+
+		# lists all languages when command "!ttshelp" is written
+		if settings["helpCommand"].lower() == data.GetParam(0).lower():
+			languages = "Available languages / voices are: "
+			for key, value in settings["enabledVoices"].items():			
+				languages += "{} ({}{})".format(value, settings["command"], key)
+				# languages += value + "(" + key +  ")"
+				languages += ", "
 			
-			messagesOfUser = [x for x in tts["queue"] if data.User == x["user"]]
+			# for key, value in voices.items():
+			# 	languages += "{} ({})".format(value, key)
+			# 	# languages += value + "(" + key +  ")"
+			# 	languages += ", "
+			languages = languages.rstrip(" ").rstrip(",")
+			for i in range(len(languages) // 490 + 1):
+				Parent.SendTwitchMessage(languages[i*490:490*(i+1)])
 
-			responseVariables["$userQueueEntries"] = len(messagesOfUser)
+		elif settings["command"].lower() in data.GetParam(0).lower():
+			message = " ".join(data.Message.split(" ")[1:])
 
-			# lists all languages when command "!ttshelp" is written
-			if settings["command"].lower() + "help" == data.GetParam(0).lower():
-				if settings["enableHelpCommand"] or Parent.HasPermission(data.User, "Caster", ""):
-					languages = "Available languages/voices are: "
-					for key,value in voices.items():
-						languages += "{} ({})".format(value, key)
-						# languages += value + "(" + key +  ")"
-						languages += ", "
-					languages = languages.rstrip(" ").rstrip(",")
-					for i in range(len(languages) % 490):
-						Parent.SendTwitchMessage(languages[i*490:490*(i+1)])
+			# check power levels - viewer, sub, mod, streamer
+			userPowerLevel = 0
+			userPowerLevel = 1 if Parent.HasPermission(data.User, "regular", "") else userPowerLevel
+			userPowerLevel = 2 if Parent.HasPermission(data.User, "subscriber", "") else userPowerLevel
+			userPowerLevel = 3 if Parent.HasPermission(data.User, "moderator", "") else userPowerLevel
+			userPowerLevel = 4 if Parent.HasPermission(data.User, "caster", "") else userPowerLevel
+			if settings["powerLevelInt"] > userPowerLevel:
+				Parent.Log("TTS Announcer", "A request has been declined because the user does not have high enough power level.")
+				return
 
-			elif settings["command"].lower() in data.GetParam(0).lower():
-				message = " ".join(data.Message.split(" ")[1:])
+			# unique key not available
+			if settings["randomKey"] == "":
+				SendMessage(settings["responseKeyMissing"])
+				return
 
-				# only moderators allowed
-				if True == settings["modsAllowedToUse"] != Parent.HasPermission(data.User, "moderator", ""):
-					return
+			# message too long
+			if len(message) > settings["userMaxMessageLength"]:
+				SendMessage(settings["responseMessageTooLong"])
+				return
 
-				# message too long
-				if len(message) > settings["userMaxMessageLength"]:
-					SendMessage(settings["responseMessageTooLong"])
-					return
+			# user has to wait to use TTS again
+			lastUsage = users.get(data.User, 1)	
+			if ConvertDatetimeToEpoch(datetime.datetime.now()) - settings["userCooldown"] < lastUsage:
+				responseVariables["$waitSeconds"] = int(ConvertDatetimeToEpoch(datetime.datetime.now()) - lastUsage + settings)["userCooldown"]
+				SendMessage(settings["responseUserSpamming"])
+				return
 
-				# user has to wait to use TTS again
-				lastUsage = users.get(data.User, 1)				
-				if ConvertDatetimeToEpoch(datetime.datetime.now()) - settings["userCooldown"] < lastUsage:
-					SendMessage(settings["responseUserSpamming"])
-					return
+			# user has too many TTS in queue
+			if len(messagesOfUser) >= settings["userMaxQueues"]:
+				SendMessage(settings["responseUserTooManyInQueue"])
+				return
 
-				# user has too many TTS in queue
-				if len(messagesOfUser) >= settings["userMaxQueues"]:
-					SendMessage(settings["responseUserTooManyInQueue"])
-					return
+			# if user doesnt have enough points
+			if Parent.GetPoints(data.User) < settings["userPointsCost"]:
+				SendMessage(settings["responseUserNotEnoughPoints"])
+				return
+			
+			# try to find voice
+			voiceFound = False
+			
+			# for key, voiceName in voices.items():
+			for key, voiceName in settings["enabledVoices"].items():	
+				if settings["command"].lower() + key == data.GetParam(0).lower():
+					voice = voiceName
+					voiceFound = True
+					break
 
-				# if user doesnt have enough points
-				if Parent.GetPoints(data.User) < settings["userPointsCost"]:
-					SendMessage(settings["responseUserNotEnoughPoints"])
-					return
-				
-				# try to find voice
-				voiceFound = False
-				for key, voiceName in voices.items():
-					if settings["command"].lower() + key == data.GetParam(0).lower():
-						voice = voiceName
-						voiceFound = True
-						break
+			# if voice hasnt been found
+			if not voiceFound:
+				SendMessage(settings["responseUserLanguageNotFound"])
+				return
 
-				# if voice hasnt been found
-				if not voiceFound:
-					SendMessage(settings["responseUserLanguageNotFound"])
-					return
-
-				users[data.User] = ConvertDatetimeToEpoch() # set last usage to "now"
-				Parent.RemovePoints(data.User, settings["userPointsCost"])
-				tts["queue"].append({
-					"user": data.User,
-					"voice": voice.replace(" ", "\%20"),
-					"message": " ".join(data.Message.split(" ")[1:]).replace(" ", "\%20"),
-				})
+			users[data.User] = ConvertDatetimeToEpoch() # set last usage to "now"
+			Parent.RemovePoints(data.User, settings["userPointsCost"])
+			tts["queue"].append({
+				"user": data.User,
+				"voice": voice.replace(" ", "%20"),
+				"message": " ".join(data.Message.split(" ")[1:]).replace(" ", "%20"),
+				# "voice": voice.replace(" ", "\%20"),
+				# "message": " ".join(data.Message.split(" ")[1:]).replace(" ", "\%20"),
+			})
+			
+			Parent.Log("TTS Announcer", "Success! Message: {}".format(" ".join(data.Message.split(" ")[1:]).replace(" ", "%20")))
 	return
 
 #---------------------------------------
@@ -233,7 +274,7 @@ def Tick():
 
 	else:
 		tts["timeUntilReady"] -= t1 - tts["timeOfLastTick"]
-	tts["timeOfLastTick"] = t1
+		tts["timeOfLastTick"] = t1
 	return
 
 #---------------------------------------
@@ -248,6 +289,9 @@ def ClearQueue():
 #---------------------------------------
 #	Helper Functinos
 #---------------------------------------
+
+def openTtsWebsite():
+	os.startfile("https://warp.world/scripts/tts-message")
 
 def ConvertDatetimeToEpoch(datetimeObject=datetime.datetime.now()):
 	# converts a datetime object to seconds in python 2.7

@@ -2,28 +2,30 @@
 Info
 #################
 
-Description: Text-to-Speech Queue
+Description: Text-to-Speech Announcer
 Created by: 
 Brain - www.twitch.tv/wellbrained
 Burny - www.twitch.tv/burnysc2
-Version: 1.0.0
+Version: 1.0.1
 
 ################
 Usage
 ################
-Download the current Ankhbot version: https://www.ankhbot.com/download/
+Download the current Streamlabs Chatbot version: https://streamlabs.com/chatbot
 
-Download and install Python 2.7.13 since that's needed for AnkhBot and Scripting features: 
+Download and install Python 2.7.13 since that's needed for Chatbot and the Script features: 
 https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi 
 
-Open AnkhBot and go to the "Scripts" tab in the bottom sidebar.
+Open the SL Chatbot and go to the "Scripts" tab in the left sidebar.
 Click on the cogwheel in the top right and set your Python directory to the `Lib` folder where you installed Python 
 (By default it should be `C:\Python27\Lib`).
 
-Copy the script to `StreamlabsBotFolder\Twitch\Scripts\`
+Copy the scripts you want to use into the folder from the SL Chatbot. You can also use the Import function per button on the top right in the "Scripts" tab.
+(By default it should be `C:\Users\<Username>\AppData\Roaming\AnkhHeart\AnkhBotR2\Twitch\Scripts`)
 
-Go back to the `Scripts` tab in AnkhBot and rightclick the background and click "Reload Scripts".
-The script should now appear in AnkhBot and you can configure your betting system script.
+Go back to the `Scripts` tab in Chatbot and rightclick the background and click "Reload Scripts". 
+Afterwards the list of installed scripts should appear and you can start configuring those.
+
 
 To get the script working:
 
@@ -41,6 +43,10 @@ Tip:
 ###############
 Version History
 ###############
+
+1.0.1:
+  ~ UI Cleanup suggestion by Brain
+
 1.0.0:
   ~ First Release version
 
