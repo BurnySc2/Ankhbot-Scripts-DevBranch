@@ -12,18 +12,19 @@ if (window.WebSocket) {
     //  Variables
     //---------------------------------
 	//  Connection Information
-	var serviceUrl = "ws://127.0.0.1:3337/AnkhBot"
+	var serviceUrl = "ws://127.0.0.1:3337/streamlabs"
 	socket = null;
 	var reconnectIntervalMs = 10000;
 
+	var hideOverlayAfterClosing = false;
 	var showWinnerForSec = 3000;
-	var bSetWinDuration = false;
-	var bHideAfterBetClosed = false;
-	var bHiddenBet = false;
-	var fadeInType = "";
+	var setShowWinnerDuration = false;
+	var betHidden = false;
+	var fadeInType;
+	var animationDuration = settings.animationDuration;
 
 	if (typeof API_Key === "undefined") {
-		$("body").html("ERROR: No API Key found!<br/>Rightclick on the Scoreboard script in AnkhBot and select \"Insert API Key\"");
+		$("body").html("ERROR: No API Key found!<br/>Rightclick on the SC2BetSystem script in Chatbot and select \"Insert API Key\"");
 		$("body").css({"font-size": "20px", "color": "#ff8080", "text-align": "center"});
 	}
 
@@ -41,24 +42,26 @@ if (window.WebSocket) {
 					"EVENT_BET_UPDATE",
 					"EVENT_BET_ABORT",
 					"EVENT_BET_WIN",
-					"EVENT_BET_LOSE"
+					"EVENT_BET_LOSE",
+					"EVENT_INIT_THEME",
+					"EVENT_BET_SHOW"
 				]
 			};
 			socket.send(JSON.stringify(auth));
-			console.log("Connected");
+			console.log("Theme 'SC2Board' Connected");
 		};
 
 		socket.onmessage = function (message) {
-			console.log("Check for Events function");
 			var jsonObject = JSON.parse(message.data);
 
 			if (jsonObject.event == "EVENT_BET_START") {
-				console.log("Animation Type: " + JSON.parse(jsonObject.data).animationType);
-				fadeInType = JSON.parse(jsonObject.data).animationType;
+				// Set FadeIn-Animation from userSettings.js
+				console.log("FadeIn Animation: " + settings.fadeInAnimationType);
+				fadeInType = settings.fadeInAnimationType;
+				animationDuration = settings.animationDuration;
 				StartBet(jsonObject.data);
 			} else if (jsonObject.event == "EVENT_BET_END") {
-				console.log("Close Bettting");
-				if (bHideAfterBetClosed) {
+				if (hideOverlayAfterClosing) {
 					HideBet();
 				}
 			} else if (jsonObject.event == "EVENT_BET_UPDATE") {
@@ -69,7 +72,10 @@ if (window.WebSocket) {
 				StreamerWins();
 			} else if (jsonObject.event == "EVENT_BET_LOSE") {
 				StreamerLoses();
-			}
+			} else if (jsonObject.event == "EVENT_BET_SHOW") {
+				console.log("DevEvent - Showing Bet");
+				ShowBet();
+			} 
 		};
 		socket.onerror = function(error) {
 			console.log("Error: " + error);
@@ -90,11 +96,12 @@ if (window.WebSocket) {
 		console.log("Start new Bet");
 		console.log(jsonObject);
 
-		bHideAfterBetClosed = jsonObject.hideAfterBetClosed;
-
-		if (!bSetWinDuration) {
+		hideOverlayAfterClosing	= jsonObject.hideAfterBetClosed;
+		if (!setShowWinnerDuration) {
+			// Set duration timer for winner
+			setShowWinnerDuration = true;
 			showWinnerForSec = jsonObject.durationShowWinner;
-			bSetWinDuration = true;
+			showWinnerForSec = showWinnerForSec+animationDuration;
 		}
 
 		$("h1").html(`${jsonObject.title}`);
@@ -126,7 +133,7 @@ if (window.WebSocket) {
 
 	function UpdateBet(data) {
 		var jsonObject = JSON.parse(data);
-		console.log("Registered new Bet");
+		console.log("Bet was updated");
 		console.log(jsonObject);
 
 		if (jsonObject.isPercentageBased) {
@@ -151,9 +158,10 @@ if (window.WebSocket) {
 
 	function StreamerWins() {
 		console.log("Streamer won");
-		if (bHiddenBet) {
+		// When hidden add a second for the FadeIn Animation
+		if (betHidden) {
 			ShowBet();
-			showWinnerForSec = showWinnerForSec+1000;
+			showWinnerForSec = showWinnerForSec+2000;
 		}
         $("#player1").addClass("winner");
 	    setTimeout(function(){
@@ -163,9 +171,10 @@ if (window.WebSocket) {
 
 	function StreamerLoses() {
 		console.log("Streamer lost");
-		if (bHiddenBet) {
+		// When hidden add a second for the FadeIn Animation
+		if (betHidden) {
 			ShowBet();
-			showWinnerForSec = showWinnerForSec+1000;
+			showWinnerForSec = showWinnerForSec+2000;
 		}
         $("#player2").addClass("winner");
 	    setTimeout(function(){
@@ -175,6 +184,8 @@ if (window.WebSocket) {
 
 	function ShowBet() {
 		console.log("Show Bet");
+		var tl = new TimelineLite();
+
 		if (fadeInType == "TopDown") {
 			$("#container").css("top", "-350px");
 		} else if (fadeInType == "BottomUp") {
@@ -185,9 +196,8 @@ if (window.WebSocket) {
 			$("#container").css("left", "650px");
 		};
 
-		$("#container").css("opacity", "1");
+		tl.fromTo("#container", 2, { opacity: 0}, { opacity: 1});
 
-		var tl = new TimelineLite();
 		if (fadeInType == "TopDown") {
 			tl.fromTo("#container", 2, { top: -350 }, { top: 0 });
 		} else if (fadeInType == "BottomUp") {
@@ -208,14 +218,12 @@ if (window.WebSocket) {
 		} else if (fadeInType == "BottomUp") {
 			tl.fromTo("#container", 2, { top: 0 }, { top: 350 });
 		} else if (fadeInType == "LeftRight") {
-			$("#container").css("left", "-650px");
 			tl.fromTo("#container", 2, { left: 0 }, { left: -650 });
 		} else if (fadeInType == "RightLeft") {
-			$("#container").css("left", "-650px");
 			tl.fromTo("#container", 2, { left: 0 }, { left: 650 });
 		}
-		$("#container").css("opacity", "0");
-		bHiddenBet = true;
+		tl.fromTo("#container", 2, { opacity: 1}, { opacity: 0});
+		betHidden = true;
 	}
 
 	function CloseBet() {
@@ -227,6 +235,6 @@ if (window.WebSocket) {
 		$("#player2").removeClass("winner");
 		$("#p1BetBox").removeClass("betWinner");
 		$("#p2BetBox").removeClass("betWinner");
-		bSetWinDuration = false;
+		setShowWinnerDuration = false;
 	}
 };
