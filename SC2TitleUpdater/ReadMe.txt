@@ -6,25 +6,28 @@ Description: Automatic Title Updater for the Game StarCraft II
 Created by: 
 Brain - www.twitch.tv/wellbrained
 Burny - www.twitch.tv/burnysc2
-Version: 1.0.1
+Version: 1.0.2
 
 
 ################
 Usage
 ################
-Download the current Ankhbot version: https://www.ankhbot.com/download/
+Download the current Streamlabs Chatbot version: https://streamlabs.com/chatbot
 
-Download and install Python 2.7.13 since that's needed for AnkhBot and Scripting features: 
+Download and install Python 2.7.13 since that's needed for Chatbot and the Script features: 
 https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi 
 
-Open AnkhBot and go to the "Scripts" tab in the bottom sidebar.
+Open the SL Chatbot and go to the "Scripts" tab in the left sidebar.
 Click on the cogwheel in the top right and set your Python directory to the `Lib` folder where you installed Python 
 (By default it should be `C:\Python27\Lib`).
 
-Copy the script to `AnkhBotFolder\Twitch\Scripts\`
+Copy the scripts you want to use into the folder from the SL Chatbot. You can also use the Import function per button on the top right in the "Scripts" tab.
+(By default it should be `C:\Users\<Username>\AppData\Roaming\AnkhHeart\AnkhBotR2\Twitch\Scripts`)
 
-Go back to the `Scripts` tab in AnkhBot and rightclick the background and click "Reload Scripts".
-The script should now appear in AnkhBot and you can configure your betting system script.
+Go back to the `Scripts` tab in Chatbot and rightclick the background and click "Reload Scripts". 
+Afterwards the list of installed scripts should appear and you can start configuring those.
+
+To enable overlays you need to click the `Insert API Key` on the contextmenu by rightclicking on the script in Chatbot.
 
 To get the client ID and oauth:
 
@@ -44,11 +47,13 @@ Don't forget to enable the checkbox "Enable Stream Title Changes" and then the t
 ###############
 Version History
 ###############
+1.0.2:
+  ~ Necessary changes since AnkhBot became Streamlabs Chatbot
+  ~ Renamed "StarCraft Accounts" to "player names"
+  ~ Using regex to get MMR from RankedFTW now
 
 1.0.1:
-  ~ using regex to get MMR from RankedFTW now
-  ~ renamed "StarCraft Accounts" to "player names"
-  ~ also added buttons that take you directly to your app creation in twitch
+  ~ Added buttons that take you directly to your app creation in twitch
 
 1.0.0:
   ~ First Release version

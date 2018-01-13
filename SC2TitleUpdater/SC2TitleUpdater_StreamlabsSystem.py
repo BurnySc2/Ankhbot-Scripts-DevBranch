@@ -28,7 +28,7 @@ ScriptName = "SCII - Title Updater"
 Website = "https://www.brains-world.eu"
 Description = "Update your Streamtitle for every StarCraft II Mode and create custom text files."
 Creator = "Brain & Burny"
-Version = "1.0.1"
+Version = "1.0.2"
 
 #---------------------------------------
 #	Set Variables
