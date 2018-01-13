@@ -25,7 +25,7 @@ ScriptName = "SCII - Scene Switcher"
 Website = "https://www.brains-world.eu"
 Description = "Scene Switcher for StarCraft II"
 Creator = "Brain & Burny"
-Version = "1.0.1"
+Version = "1.0.2"
 
 #---------------------------------------
 #	Set Variables
