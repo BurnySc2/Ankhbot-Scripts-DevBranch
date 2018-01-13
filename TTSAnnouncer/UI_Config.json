@@ -1,6 +1,5 @@
 ﻿{
     "output_file": "TTSAnnouncer.json",
-
     "clearQueue": {
         "type": "button",
         "label": "Clear TTS Queue",
@@ -13,7 +12,7 @@
         "type": "textbox",
         "value": "!tts",
         "label": "TTS command",
-        "tooltip": "",
+        "tooltip": "Use this command together with the message afterwards (e.g. !tts Hello World).",
         "group": ""
     },
     "minPowerLevel": {
@@ -21,37 +20,20 @@
         "label": "Min Power Level",
         "value": "Everyone",
         "tooltip": "Minimum power level required to be able to trigger Text-To-Speech.",
-        "items": ["Everyone", "Regular", "Sub", "Mod", "Streamer"],
+        "items": [
+            "Everyone",
+            "Regular",
+            "Sub",
+            "Mod",
+            "Streamer"
+        ],
         "group": ""
     },
     "userPointsCost": {
-        "type": "slider",
-        "value": 0,
-        "min": 0,
-        "max": 500,
-        "ticks": 5,
-        "label": "Cost to trigger TTS",
+        "type": "numberbox",
+        "value": 10,
+        "label": "Cost to use",
         "tooltip": "How many points will be subtracted when a user uses the TTS command.",
-        "group": ""
-    },   
-    "userCooldown": {
-        "type": "slider",
-        "value": 0,
-        "min": 0,
-        "max": 600,
-        "ticks": 5,
-        "label": "User Cooldown (seconds)",
-        "tooltip": "How many seconds a user has to wait until he is allowed to use the TTS command again.",
-        "group": ""
-    },
-    "userMaxQueues": {
-        "type": "slider",
-        "value": 3,
-        "min": 1,
-        "max": 10,
-        "ticks": 1,
-        "label": "Max Queues per User",
-        "tooltip": "How many TTS queues a user is allowed to have active.\r\nE.g. if this value is at 5, it means the user has to wait until his first TTS is played until he is allowed to queue another one.",
         "group": ""
     },
     "defaultVoice": {
@@ -73,9 +55,49 @@
             "Spanish Female",
             "Swedish Female",
             "Turkish Female",
-            "UK English Female", 
-            "US English Female",
+            "UK English Female",
+            "US English Female"
         ],
+        "group": ""
+    },
+    "userCooldown": {
+        "type": "slider",
+        "value": 30,
+        "min": 0,
+        "max": 600,
+        "ticks": 10,
+        "label": "User Cooldown (seconds)",
+        "tooltip": "How many seconds a user has to wait until he is allowed to use the TTS command again.",
+        "group": ""
+    },
+    "userMaxQueues": {
+        "type": "slider",
+        "value": 3,
+        "min": 1,
+        "max": 10,
+        "ticks": 1,
+        "label": "Max Queues per User",
+        "tooltip": "How many TTS queues a user is allowed to have active.",
+        "group": ""
+    },
+    "globalCooldown": {
+        "type": "slider",
+        "value": 60,
+        "min": 0,
+        "max": 600,
+        "ticks": 5,
+        "label": "Global Cooldown (seconds)",
+        "tooltip": "How many seconds need to pass between each TTS call",
+        "group": ""
+    },
+    "globalMaxQueues": {
+        "type": "slider",
+        "value": 10,
+        "min": 1,
+        "max": 50,
+        "ticks": 1,
+        "label": "Max Queues Globally",
+        "tooltip": "How many total TTS queues are allowed to be active.",
         "group": ""
     },
     "userMaxMessageLength": {
@@ -85,8 +107,8 @@
         "max": 270,
         "ticks": 10,
         "label": "TTS Message Length",
-        "tooltip": "How many characters are allowed per TTS message?\r\nAlthough Twitch messages have a limit of 500 characters, it seems that text-to-speech only works on up to 270 characters.",
-        "group": ""
+        "tooltip": "How many characters are allowed per TTS message?",
+        "group": "Length, Volume, Help and Blacklist"
     },
     "volume": {
         "type": "slider",
@@ -95,117 +117,124 @@
         "max": 100,
         "ticks": 1,
         "label": "Audio Volume",
-        "tooltip": "",
-        "group": ""
+        "tooltip": "Volume of the announcer for the TTS message",
+        "group": "Length, Volume, Help and Blacklist"
     },
     "helpCommand": {
         "type": "textbox",
         "value": "!ttshelp",
         "label": "Help Command",
-        "tooltip": "Lists all the enabled languages.",
-        "group": ""
+        "tooltip": "Lists all the enabled languages in chat.",
+        "group": "Length, Volume, Help and Blacklist"
+    },
+    "blackWordFilter": {
+        "type": "textbox",
+        "value": "Trump, Nigger, Jew, Nazi, Nigga, Faggot",
+        "label": "Black List",
+        "tooltip": "List of words you want to get filtered seperated through commas.\r\nAdditionally the message will be purged.",
+        "group": "Length, Volume, Help and Blacklist"
     },
     "languagezh": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(ZH) Chinese",
         "tooltip": "If you want to use a chinese announcer write !ttszh <your message>",
         "group": "Additional Languages"
     },
     "languagenl": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(NL) Dutch",
         "tooltip": "If you want to use a dutch announcer write !ttsnl <your message>",
         "group": "Additional Languages"
     },
     "languagefr": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(FR) French",
         "tooltip": "If you want to use a french announcer write !ttsfr <your message>",
         "group": "Additional Languages"
     },
     "languagede": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(DE) German",
         "tooltip": "If you want to use a german announcer write !ttsde <your message>",
         "group": "Additional Languages"
     },
     "languageit": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(IT) Italian",
         "tooltip": "If you want to use a italian announcer write !ttsit <your message>",
         "group": "Additional Languages"
     },
     "languageja": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(JA) Japanese",
         "tooltip": "If you want to use a japanese announcer write !ttsja <your message>",
         "group": "Additional Languages"
     },
     "languageko": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(KO) Korean",
         "tooltip": "If you want to use a korean announcer write !ttsko <your message>",
         "group": "Additional Languages"
     },
     "languagepl": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(PL) Polish",
         "tooltip": "If you want to use a polish announcer write !ttspl <your message>",
         "group": "Additional Languages"
     },
     "languagept": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(PT) Portuguese",
         "tooltip": "If you want to use a portuguese announcer write !ttspt <your message>",
         "group": "Additional Languages"
     },
     "languageru": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(RU) Russian",
         "tooltip": "If you want to use a russian announcer write !ttsru <your message>",
         "group": "Additional Languages"
     },
     "languagetr": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(TR) Turkish",
         "tooltip": "If you want to use a turkish announcer write !ttstr <your message>",
         "group": "Additional Languages"
     },
     "languagees": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(ES) Spanish",
         "tooltip": "If you want to use a spanish announcer write !ttses <your message>",
         "group": "Additional Languages"
     },
     "languagesv": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(SV) Swedish",
         "tooltip": "If you want to use a swedish announcer write !ttssv <your message>",
         "group": "Additional Languages"
     },
     "languageen": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(EN) UK English",
         "tooltip": "If you want to use a british announcer write !ttsen <your message>",
         "group": "Additional Languages"
     },
     "languageus": {
         "type": "checkbox",
-        "value": true,
+        "value": false,
         "label": "(US) US English",
         "tooltip": "If you want to use a US announcer write !ttsus <your message>",
         "group": "Additional Languages"
@@ -214,57 +243,72 @@
         "type": "textbox",
         "value": "@$user your message is longer than the character limit ($characterLimit).",
         "label": "Message Too Long",
-        "tooltip": "",
+        "tooltip": "Error message in chat when the user wrote too many characters.",
         "group": "Error Responses"
     },
     "responseUserSpamming": {
         "type": "textbox",
         "value": "@$user you have to wait $waitSeconds seconds.",
         "label": "TTS used too often",
-        "tooltip": "",
+        "tooltip": "Error message in chat when the user wrote too many messages within a certain time.",
+        "group": "Error Responses"
+    },
+    "responseGlobalQueueActive": {
+        "type": "textbox",
+        "value": "@$user global cooldown active, you have to wait $waitSeconds seconds.",
+        "label": "Global Cooldown active",
+        "tooltip": "Error message in chat when the user wrote during the global cooldown.",
         "group": "Error Responses"
     },
     "responseUserNotEnoughPoints": {
         "type": "textbox",
         "value": "@$user you need $pointCost $currencyName but only have $userPoints $currencyName.",
         "label": "Not enough Points",
-        "tooltip": "",
+        "tooltip": "Error message in chat when the user has not enough currency.",
         "group": "Error Responses"
     },
     "responseUserLanguageNotFound": {
         "type": "textbox",
         "value": "@$user language hasn't been found! Use $helpCommand to get a list of available languages.",
         "label": "Language not found",
-        "tooltip": "",
+        "tooltip": "Error message in chat when the user tried to use tts with a not used language.",
         "group": "Error Responses"
     },
     "responseUserTooManyInQueue": {
         "type": "textbox",
         "value": "@$user you have reached the limit of $maxQueue queue entries.",
         "label": "Too many TTS in queue",
-        "tooltip": "",
+        "tooltip": "Error message in chat when the user has reached the max amount of messages.",
         "group": "Error Responses"
     },
     "responseKeyMissing": {
         "type": "textbox",
         "value": "Streamlabs TTS Queue: It looks like the $streamer hasn't set up the Unique Key value yet. TTS will not be useable.",
         "label": "Unique Key Missing",
-        "tooltip": "",
+        "tooltip": "Error message in chat when the streamer didn't enter the Unique Key in the scripts.",
         "group": "Error Responses"
     },
-    "randomKey": {
+    "responseGloballyTooManyInQueue": {
         "type": "textbox",
-        "value": "",
-        "label": "Unique Key",
-        "tooltip": "This acts as a \"secret key\" to trigger your TTS messages.\r\nIf you notice that a TTS goes off that wasn't triggered in your channel, change your key!\r\nIt means that someone else is using this key (on purpose or accidently) to trigger messages in your stream.\r\nSo make sure your key is unique!",
-        "group": "Unique Key (Hidden)"
+        "value": "@$user the total TTS queue of $maxGlobalQueue entries is full.",
+        "label": "Global queue full",
+        "tooltip": "Error message in chat when the user reached the global limit of messages.",
+        "group": "Error Responses"
     },
-    "btnGoToOauth": {
+    "btnOpenWebsiteNewKey": {
         "type": "button",
-        "label": "TTS Website",
-        "tooltip": "Opens a tab in your default browser that directs you to your browser source URL and where you can get your unique key from.",
-        "function": "openTtsWebsite",
+        "label": "Open the link in my browser",
+        "tooltip": "Opens a tab in your default browser with the link for the BrowserSource.",
+        "function": "OpenWebsiteForBrowserSource",
         "wsevent": "",
-        "group": "Unique Key (Hidden)"
+        "group": "Get a link for your Browser Source"
+    },
+    "btnWhisperNewKey": {
+        "type": "button",
+        "label": "Whisper me the link per Twitch",
+        "tooltip": "Your bot will whisper you the link for the BrowserSource.\r\nIMPORTANT: This will only work if you have a seperate twitch account for your bot! If you don't have seperate ones - use the button above!",
+        "function": "GenerateAndWhisperKey",
+        "wsevent": "",
+        "group": "Get a link for your Browser Source"
     }
 }
