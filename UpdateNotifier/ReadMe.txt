@@ -4,7 +4,7 @@ Info
 Description: Notifies you about updates on your installed scripts
 Created by: 
 Brain - www.twitch.tv/wellbrained
-Version: 1.0.1
+Version: 1.1.0
 
 ###############
 Description
@@ -25,6 +25,13 @@ My Discord information is: @Brain#0766 (Also on Streamlabs Chatbot Discord serve
 ###############
 Version History
 ###############
+1.1.0:
+ ~ Changed methods to support Chatbot .29+ versions
+
+1.0.2:
+ ~ Added option to get notified per MessageBox (Popup) - Note: This will only work per button and not on startup (spam protection)
+ ~ Added option to decide if you want to get notified per startup or only on button press
+
 1.0.1:
  ~ Bugfixes
  

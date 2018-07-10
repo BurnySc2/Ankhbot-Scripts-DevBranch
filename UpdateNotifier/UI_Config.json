@@ -45,6 +45,13 @@
         "tooltip": "If you want the bot to write you per whisper message on Twitch.",
         "group": ""
     },
+    "cbSendPerMessageBox": {
+        "type": "checkbox",
+        "value": false,
+        "label": "Notifications per MessageBox (Popup)",
+        "tooltip": "If you want the bot to open a messagebox.",
+        "group": ""
+    },
     "cbNotifyOnSuccess": {
         "type": "checkbox",
         "value": false,
@@ -52,11 +59,18 @@
         "tooltip": "If you want a response message even when no changes exists",
         "group": ""
     },
+    "cbNotifyOnStartup": {
+        "type": "checkbox",
+        "value": false,
+        "label": "Check script versions on startup too",
+        "tooltip": "If you want a response message also when the script gets loaded.",
+        "group": ""
+    },
     "btnCheckVersions": {
         "type": "button",
         "label": "Check script versions",
         "tooltip": "Checks the versions of your scripts.",
-        "function": "CheckScripts",
+        "function": "BtnCheckScripts",
         "wsevent": "",
         "group": ""
     }
