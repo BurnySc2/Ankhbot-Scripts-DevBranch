@@ -5,7 +5,7 @@ Description: Tweets when you are going live!
 Created by: 
 Brain - www.twitch.tv/wellbrained
 Burny - www.twitch.tv/burnysc2
-Version: 1.1.1
+Version: 1.2.0
 
 
 ################
@@ -60,6 +60,16 @@ Afterwards the list of installed scripts should appear and you can start configu
 ###############
 Version History
 ###############
+1.2.0:
+  ~ Way better error logging (detection if python path or keys were incorrectly entered)
+  ~ Added logs when $game and $title could not be replaced
+  ~ Logs for which user the tweet was posted
+  ~ "Install pip requests" command window stays open after the installation finished (so errors can be tracked down if any occured)
+  ~ Saves script status to file in case of Streamlabs Chatbot restart during the stream to prevent a new automatic tweet
+  ~ Added a $preview variable for twitch users - contains a link to a preview image to the stream
+  ~ (optional) sends a new tweet when the streamer started playing a different game (tweet on game change), added a new text file for this feature (tweetOnGameChange.txt)
+  ~ (optional) sends new tweet when some time (30-300 minutes) has passed since the stream went live, added a new text file for this feature (tweetPeriodic.txt)
+  ~ (optional) removal of last tweet sent by bot before sending new one
 1.1.1:
   ~ Emojis are now supported
 1.1.0:

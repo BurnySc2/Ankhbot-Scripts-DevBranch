@@ -1,6 +1,0 @@
-~ LIVE ~
-
-Playing: $game
-$message
-
-$url
