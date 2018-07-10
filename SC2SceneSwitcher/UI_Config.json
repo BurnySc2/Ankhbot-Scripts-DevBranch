@@ -2,13 +2,18 @@
     "output_file": "SC2SceneSwitcherConfig.json",
 
     // Default Settings
-    "isEnabled": {
-        "type": "checkbox",
-        "value": false,
-        "label": "Enable OBS Scene Switcher",
-        "tooltip": "Enable this Checkbox if you want to activate the Scene Switcher",
+    "switchAtLoadingScreen": {
+        "type": "dropdown", 
+        "items": [
+            "Switch at Game Start", 
+            "Switch at Loading Screen (1-2sec Delay)", 
+            "Switch at Loading Screen (ASAP)"
+        ], 
+        "label": "Switch at Loading Screen (1-2sec Delay)", 
+        "tooltip": "Switches from the \"In Menu\" to \"In Game\" or \"In Replay\" scene\r\n\r\n1. Switches scene when the game started (after loading screen)\r\n2. Switches scene when the game loads (with 1-2 delay)\r\n3. Switches scene when the game loads (without delay. Might cause a wrong scene switch first if a \"Scene - In Replay\" is entered)", 
+        "value": "Switch at loading screen", 
         "group": ""
-    },
+    }, 
     "obsSceneInMenu": {
         "type": "textbox",
         "value": "",
@@ -58,4 +63,11 @@
         "tooltip": "Scene which activates when you're in a replay as caster.\r\nLeave this field empty if you don't want the script to automatically switch to this scene.",
         "group": ""
     },
+    "gamingPcIp": {
+        "type": "textbox",
+        "value": "",
+        "label": "Gaming PC IP",
+        "tooltip": "If you use a two PC streaming setup, run Streamlabs Chatbox and OBS on the same PC. \r\nThen enter the gaming PC IP in this field.\r\nLeave empty if you use single PC streaming setup.",
+        "group": "Two PC Setup"
+    }
 }
