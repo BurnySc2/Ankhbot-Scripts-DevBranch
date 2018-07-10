@@ -1,0 +1,361 @@
+﻿{
+  "output_file": "SC2MatchInfoConfig.json",
+
+  // Default Settings
+  "openReadMe": {
+    "type": "button",
+    "label": "Open Readme.txt",
+    "tooltip": "Opens the 'Readme.txt' for this script.",
+    "function": "BtnOpenReadMe",
+    "wsevent": "",
+    "group": ""
+  },
+  "openOverlayFilesFolder": {
+    "type": "button",
+    "label": "Open Overlay Files Folder",
+    "tooltip": "Opens the folder where the overlay text files are located in.",
+    "function": "BtnOpenOverlayFilesFolder",
+    "wsevent": "",
+    "group": ""
+  },
+  "chosenServer": {
+    "type": "dropdown",
+    "label": "SC2 Region/Server",
+    "value": "Auto",
+    "tooltip":
+      "Choose the SC2 region/server you are playing on.\r\nThis selection is optional but increases the accuracy of information.\r\nIf your MMR is not properly detected, it would be best to select a server.\r\n\r\n\"Auto\" if you keep switching servers.\r\nSet a specific region if you only play on one region.",
+    "items": ["Auto", "US", "EU", "KR"],
+    "group": ""
+  },
+  "findOpponentMmrOption": {
+    "type": "dropdown",
+    "label": "Find Opponent Method",
+    "value": "Closest MMR",
+    "tooltip":
+      "We're working with sc2unmasked.com to find the opponent you're playing against and his infos. Sometimes the opponents name is found multiple times and setting the correct method for you can increase the success/accuracy.\r\n\r\nClosest MMR:\r\nThis method will pick the opponent listed closest to your mmr.\r\n\r\nMost Recent Activity:\r\nThis method will pick the opponent which has played the most recent ranked match.",
+    "items": ["Closest MMR", "Most Recent Activity"],
+    "group": ""
+  },
+  "enableUnbarcoder": {
+    "type": "checkbox",
+    "value": true,
+    "label": "Reveal Barcodes and Smurfs",
+    "tooltip": "Enable this checkbox to let the script attempt to identify your opponent if your opponent is a barcode or smurf (with the help of sc2unmasked.com).",
+    "group": ""
+  },
+  "enabledTitleUpdater": {
+    "type": "checkbox",
+    "value": false,
+    "label": "Update stream title",
+    "tooltip": "Enable this checkbox if you want the script to update your title on Twitch.\r\nNote: To use this the 'Twitch oAuth Token' in 'Configuration Options' section is necessary.",
+    "group": ""
+  },
+  "enabledOverlayUpdater": {
+    "type": "checkbox",
+    "value": true,
+    "label": "Update overlay textfiles",
+    "tooltip": "Enable this checkbox if you want to use the Overlay textfiles.",
+    "group": ""
+  },
+  "titleInMenu": {
+    "type": "textbox",
+    "value": "",
+    "label": "Title - In Menu",
+    "tooltip":
+      "Twitch title will be updated to this when changing to the SC2 Menu.\r\n\r\nExample: [$SERVER] [My MMR: $p1mmr] Waiting for new opponent\r\nResult: [EU] [My MMR: 5000] Waiting for new opponent",
+    "group": "Twitch Title Changer"
+  },
+  "titleInGameAsPlayer": {
+    "type": "textbox",
+    "value": "",
+    "label": "Title - Ingame (as Player)",
+    "tooltip":
+      "Twitch title will be updated to this when starting a new game.\r\n\r\nExample: [$SERVER] [My MMR: $p1mmr] $matchup vs $p2name\r\nResult: [EU] [My MMR: 5000] ZvT vs Burny",
+    "group": "Twitch Title Changer"
+  },
+  "titleInGameAsCaster": {
+    "type": "textbox",
+    "value": "",
+    "label": "Title - Ingame (as Caster)",
+    "tooltip":
+      "Twitch title will be updated to this when you're in a game as observer or referee.\r\n\r\nExample: $p1name vs $p2name ($matchup) - Casting Tournament XY\r\nResult: Showtime vs soO (PvZ) - Casting Tournament XY",
+    "group": "Twitch Title Changer"
+  },
+  "titleInGameAsOther": {
+    "type": "textbox",
+    "value": "",
+    "label": "Title - Ingame (Teamgame, Coop, Arcade)",
+    "tooltip":
+      "Twitch title will be updated when you're in a game mode like coop, teamgames, arcade or archon.\r\n\r\nExample: [$SERVER] $p1mmrmmr plays Funmaps\r\nResult: [EU] 5000mmr plays Funmaps",
+    "group": "Twitch Title Changer"
+  },
+  "titleIn1v1Replay": {
+    "type": "textbox",
+    "value": "",
+    "label": "Title - In Replay",
+    "tooltip":
+      "Twitch title will be updated when you're in a replay.\r\n\r\nExample: [$SERVER] $p1mmrmmr - Replay Analysis\r\nResult: [EU] 5000mmr - Replay analysis",
+    "group": "Twitch Title Changer"
+  },
+  "overlayText1": {
+    "type": "textbox",
+    "value": "Playing against $p2name ($p2race, $p2mmr)",
+    "label": "MatchInfo - On Change 1",
+    "tooltip":
+      "This text will be in textfile 'MatchInfo - On Change 1.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($p2race, $p2mmr)",
+    "group": "Overlay file - On Change"
+  },
+  "overlayText2": {
+    "type": "textbox",
+    "value": "My mmr: $p1mmr",
+    "label": "MatchInfo - On Change 2",
+    "tooltip":
+      "This text will be in textfile 'MatchInfo - On Change 2.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($p2race, $p2mmr)",
+    "group": "Overlay file - On Change"
+  },
+  "overlayText3": {
+    "type": "textbox",
+    "value": "Playing a $matchup$ against $p2name",
+    "label": "MatchInfo - On Change 3",
+    "tooltip":
+      "This text will be in textfile 'MatchInfo - On Change 3.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($p2race, $p2mmr)",
+    "group": "Overlay file - On Change"
+  },
+
+  "overlayText41": {
+    "type": "textbox",
+    "value": "Waiting for the next opponent",
+    "label": "Change On Scene 1 - In Menu",
+    "tooltip":
+      "This text will only be used when you're in the menu. Textfile: 'MatchInfo - Change On Scene 1.txt'. It changes the variables into actual live data.\r\nExample: Waiting for the next opponent",
+    "group": "Overlay file - Change On Scene #1"
+  },
+  "overlayText42": {
+    "type": "textbox",
+    "value": "Playing against $p2name ($p2race, $p2mmr)",
+    "label": "Change On Scene 1 - In Game",
+    "tooltip":
+      "This text will only be used when you're in a game. Textfile: 'MatchInfo - Change On Scene 1.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($p2race, $p2mmr)",
+    "group": "Overlay file - Change On Scene #1"
+  },
+  "overlayText43": {
+    "type": "textbox",
+    "value": "",
+    "label": "Change On Scene 1 - Casting",
+    "tooltip":
+      "This text will only be used when you're in a cast. Textfile: 'MatchInfo - Change On Scene 1.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($p2race)",
+    "group": "Overlay file - Change On Scene #1"
+  },
+
+  "overlayText51": {
+    "type": "textbox",
+    "value": "",
+    "label": "Change On Scene 2 - In Menu",
+    "tooltip":
+      "This text will only be used when you're in the menu. Textfile: 'MatchInfo - Change On Scene 2.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($race$)",
+    "group": "Overlay file - Change On Scene #2"
+  },
+  "overlayText52": {
+    "type": "textbox",
+    "value": "",
+    "label": "Change On Scene 2 - In Game",
+    "tooltip":
+      "This text will only be used when you're in a game. Textfile: 'MatchInfo - Change On Scene 2.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($race$)",
+    "group": "Overlay file - Change On Scene #2"
+  },
+  "overlayText53": {
+    "type": "textbox",
+    "value": "",
+    "label": "Change On Scene 2 - Casting",
+    "tooltip":
+      "This text will only be used when you're in a cast. Textfile: 'MatchInfo - Change On Scene 2.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($race$)",
+    "group": "Overlay file - Change On Scene #2"
+  },
+  "overlayText61": {
+    "type": "textbox",
+    "value": "",
+    "label": "Change On Scene 3 - In Menu",
+    "tooltip":
+      "This text will only be used when you're in the menu. Textfile: 'MatchInfo - Change On Scene 3.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($race$)",
+    "group": "Overlay file - Change On Scene #3"
+  },
+  "overlayText62": {
+    "type": "textbox",
+    "value": "",
+    "label": "Change On Scene 3 - In Game",
+    "tooltip":
+      "This text will only be used when you're in a game. Textfile: 'MatchInfo - Change On Scene 3.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($race$)",
+    "group": "Overlay file - Change On Scene #3"
+  },
+  "overlayText63": {
+    "type": "textbox",
+    "value": "",
+    "label": "Change On Scene 3 - Casting",
+    "tooltip":
+      "This text will only be used when you're in a cast. Textfile: 'MatchInfo - Change On Scene 3.txt'. It changes the variables into actual live data.\r\nExample: Playing against $p2name ($race$)",
+    "group": "Overlay file - Change On Scene #3"
+  },
+
+  "enableStreamerShoutout": {
+    "type": "checkbox",
+    "value": false,
+    "label": "Enable Streamer Shoutout",
+    "tooltip":
+      "Enable this checkbox if you want the streamer shoutout to be written to your twitch channel. This only happens if the opponent is streaming right now too.",
+    "group": "Opponent Streamer Shoutout"
+  },
+  "useMultitwitch": {
+    "type": "checkbox",
+    "value": true,
+    "label": "Multitwitch instead of Twitch Link",
+    "tooltip":
+      "Enable this checkbox if you want the \"$p2url\" variable to be replaced with multitwitch link (Example: http://multitwitch.tv/wellbrained/burnysc2) instead of the opponents twitch link (Doesn't work when opponent isn't streaming on Twitch).",
+    "group": "Opponent Streamer Shoutout"
+  },
+  "postOpponentLinkInChat": {
+    "type": "textbox",
+    "value": "My opponent $p2name is also streaming currently - Watch from both sides: $p2url",
+    "label": "Message if opponent is streaming too",
+    "tooltip":
+      "If the opponent was found on sc2unmasked and is streaming right now, this message will be written in chat.\r\n\r\nUsable variables:\r\n$p1race = Your race\r\n$p2race = Opponents race\r\n$p2name = Opponents name\r\n$p2url = Twitch channel to opponent",
+    "group": "Opponent Streamer Shoutout"
+  },
+  "streamerBlacklist": {
+    "type": "textbox",
+    "value": "",
+    "label": "Blacklist Streamers",
+    "tooltip":
+      "Enter the Twitch usernames of people you don't want to shoutout. Seperate multiple ones per comma.",
+    "group": "Opponent Streamer Shoutout"
+  },
+
+  "bnetUsername1": {
+    "type": "textbox",
+    "value": "SC2 Ingame Name (eg: Brain)",
+    "label": "Name of Account #1",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without any BattleTag Code '#1234')\r\nExample: Brain",
+    "group": "Player Names"
+  },
+  "bnetUsername2": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #2",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')\r\nExample: Burny",
+    "group": "Player Names"
+  },
+  "bnetUsername3": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #3",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')",
+    "group": "Player Names"
+  },
+  "bnetUsername4": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #4",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')",
+    "group": "Player Names"
+  },
+  "bnetUsername5": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #5",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')",
+    "group": "Player Names"
+  },
+  "bnetUsername6": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #6",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')",
+    "group": "Player Names"
+  },
+  "bnetUsername7": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #7",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')",
+    "group": "Player Names"
+  },
+  "bnetUsername8": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #8",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')",
+    "group": "Player Names"
+  },
+  "bnetUsername9": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #9",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')",
+    "group": "Player Names"
+  },
+  "bnetUsername10": {
+    "type": "textbox",
+    "value": "",
+    "label": "Name of Account #10",
+    "tooltip":
+      "Enter your StarCraft II Ingame name (without the BattleTag Code '#1234')",
+    "group": "Player Names"
+  },  
+  "devDebugLogging": {
+      "type": "checkbox", 
+      "value": true, 
+      "label": "Enable Logging", 
+      "tooltip": "Logs the whole process into daily log files in the \"Logs\" subfolder in case you're running into trouble you can send those to the developers to get looked at.",
+      "group": "Configuration Options"
+  }, 
+  "btnOpenLogFolder": {
+    "type": "button",
+    "label": "Open Logs Folder",
+    "tooltip": "Click the button to open the Logs folder.",
+    "function": "OpenLogFolder",
+    "wsevent": "",
+    "group": "Configuration Options"
+  },
+  "oauth": {
+    "type": "textbox",
+    "value": "",
+    "label": "Twitch oAuth Token",
+    "tooltip":
+      "Enter your oAuth token here which you will get from the button below.",
+    "group": "Configuration Options"
+  },
+  "btnGoToOauth": {
+    "type": "button",
+    "label": "Get OAuth Token",
+    "tooltip":
+      "You only need the Twitch oAuth Token if you want to update your stream title. Otherwise it's unnecessary to do.\r\n\r\nThis button will redirect you to WellBrained's website to generate an oAuth access token which allows the script to update your Twitch title.\r\nClick the \"Generate oAuth token\" button on the website and paste the token in the field above.",
+    "function": "OpenOauthLink",
+    "wsevent": "",
+    "group": "Configuration Options"
+  },
+  "btnGoToVariables": {
+    "type": "button",
+    "label": "Overview of all variables",
+    "tooltip":
+      "This button will redirect you to WellBrained's website to see an overview of all usable variables in the textfields.",
+    "function": "OpenVariables",
+    "wsevent": "",
+    "group": "Configuration Options"
+  },
+  "gamingPcIp": {
+    "type": "textbox",
+    "value": "",
+    "label": "Gaming PC - IP:Port",
+    "tooltip":
+      "Leave this field empty if you use a single pc setup!\r\n\r\nIf you are using a dual pc setup enter the gaming pc ip:port in this field.\r\nA step-by-step instruction on how to set it up is within the Readme (click the 'Open Readme.txt' button on top).",
+    "group": "Configuration Options"
+  }
+}
