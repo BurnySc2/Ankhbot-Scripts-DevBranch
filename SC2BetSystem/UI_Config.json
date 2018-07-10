@@ -1,14 +1,31 @@
 ﻿{
     "output_file": "SC2BetSystemConfig.json", 
+    "openReadMe": {
+        "type": "button", 
+        "label": "Open Readme.txt", 
+        "tooltip": "Opens the 'Readme.txt' for this script.", 
+        "function": "OpenReadMe", 
+        "wsevent": "", 
+        "group": ""
+    }, 
+    "openOverlayFolder": {
+        "type": "button", 
+        "label": "Open Overlays Folder", 
+        "tooltip": "Opens the folder where you can find the index.html file that needs to be added as browser source in OBS.", 
+        "function": "BtnOpenOverlaysFolder", 
+        "wsevent": "", 
+        "group": ""
+    }, 
     "overlayThemeNames": {
         "type": "dropdown", 
         "items": [
+            "GSL", 
             "SC2Board", 
             "SC2ScoreBoard"
         ], 
         "label": "Overlay Theme", 
         "tooltip": "Overlay Theme", 
-        "value": "SC2Board", 
+        "value": "GSL", 
         "group": ""
     }, 
     "betDuration": {
@@ -44,7 +61,7 @@
     "betWinnerAnnoucementDelay": {
         "type": "slider", 
         "label": "Chat delay - Announcement of Winner", 
-        "value": 5, 
+        "value": 10, 
         "min": 0, 
         "max": 180, 
         "ticks": 5, 
@@ -60,7 +77,7 @@
     }, 
     "maxBet": {
         "type": "numberbox", 
-        "value": 150, 
+        "value": 500, 
         "label": "Maximum amount to bet", 
         "tooltip": "Maximum amount of points (currency) to bet.", 
         "group": "Cost & Commands"
@@ -68,21 +85,21 @@
     "cmdBetWin": {
         "type": "textbox", 
         "value": "#win", 
-        "label": "Command to bet/vote for the streamer", 
+        "label": "Command to bet/vote for a win", 
         "tooltip": "Command for viewers to bet on the streamer.\r\nExample: #win", 
         "group": "Cost & Commands"
     }, 
     "cmdBetLose": {
         "type": "textbox", 
         "value": "#lose", 
-        "label": "Command to bet/vote against the streamer", 
+        "label": "Command to bet/vote for a loss", 
         "tooltip": "Command for viewers to bet against the streamer.\r\nExample: #lose", 
         "group": "Cost & Commands"
     }, 
     "cmdAbort": {
         "type": "textbox", 
         "value": "#abort", 
-        "label": "Command to abort the current bet (Refunds participants)", 
+        "label": "Command to abort and refund", 
         "tooltip": "Command for the streamer to abort the current bet.\r\nExample: #abort", 
         "group": "Cost & Commands"
     }, 
@@ -96,7 +113,7 @@
     "noBetsOnlyVotes": {
         "type": "checkbox", 
         "value": false, 
-        "label": "Change Betting to Voting system (without currency)", 
+        "label": "Change Betting to Voting system (w/o currency)", 
         "tooltip": "This option replaces the betting system with a voting system (no currency).\r\nIMPORTANT: Don't forget to adjust the response messages and overlay labels accordingly.", 
         "group": "Voting System"
     }, 
@@ -116,7 +133,7 @@
     }, 
     "overlayTitle": {
         "type": "textbox", 
-        "value": "Who will win?", 
+        "value": "WHO WILL WIN?", 
         "label": "Title", 
         "tooltip": "Set the title for the overlay.", 
         "group": "Overlay Settings"
@@ -130,29 +147,29 @@
     }, 
     "overlayChatCmdWin": {
         "type": "textbox", 
-        "value": "$cmdBetWin <Amount>", 
-        "label": "HowTo Example: Chat command to bet on streamer (max 20)", 
+        "value": "$cmdBetWin [Amount]", 
+        "label": "Example command to bet on win (max 20)", 
         "tooltip": "Example text for people to see how to bet on the streamer.\r\nE.g. for betting you can put \"$cmdBetWin {Amount}\"\r\nE.g. for voting system you can just put \"$cmdBetWin\"", 
         "group": "Overlay Settings"
     }, 
     "overlayChatCmdLose": {
         "type": "textbox", 
-        "value": "$cmdBetLose <Amount>", 
-        "label": "HowTo Example: Chat command to bet against streamer (max 20)", 
+        "value": "$cmdBetLose [Amount]", 
+        "label": "Example command to bet on loss (max 20)", 
         "tooltip": "Example text for people to see how to bet against the streamer.\r\nE.g. for betting you can put \"$cmdBetLose {Amount}\"\r\nE.g. for voting system you can just put \"$cmdBetLose\"", 
         "group": "Overlay Settings"
     }, 
     "overlayLabelWin": {
         "type": "textbox", 
         "value": "Total amount $cmdBetWin", 
-        "label": "Label - Total amount of points on Streamer (max 24 digits)", 
+        "label": "Total points on win (max 24 digits)", 
         "tooltip": "Text which gets displayed next to the total amount of points bet on the streamer.", 
         "group": "Overlay Settings"
     }, 
     "overlayLabelLose": {
         "type": "textbox", 
         "value": "Total amount $cmdBetLose", 
-        "label": "Label - Total amount of points against Streamer (max 24 digits)", 
+        "label": "Total points on loss (max 24 digits)", 
         "tooltip": "Text which gets displayed next to the total amount of points bet against the streamer.", 
         "group": "Overlay Settings"
     }, 
@@ -179,6 +196,79 @@
         "label": "Display percentages", 
         "tooltip": "This option changes the overlay to display percentages instead of absolute numbers\r\ne.g. for voting, it will now show 75% voted on the player and 25% on the opponent", 
         "group": "Overlay Settings"
+    }, 
+    "capitalizeNames": {
+        "type": "checkbox", 
+        "value": false, 
+        "label": "Capitalize all Names", 
+        "tooltip": "This option decides if you want to capitalize all the names in the overlays.", 
+        "group": "Overlay Settings"
+    }, 
+    "enableSounds": {
+        "type": "checkbox", 
+        "value": false, 
+        "label": "Enable Sounds in Overlays", 
+        "tooltip": "This option let's you use sound files in the overlays.", 
+        "group": "Sounds"
+    }, 
+    "soundStart": {
+        "type": "textbox", 
+        "value": "Start.mp3", 
+        "label": "Soundfile for Game Start", 
+        "tooltip": "Sounds for the Start of the Game\r\nImportant: Name is case-sensitive and make sure to add the type behind it (e.g.: Audio.mp3).", 
+        "group": "Sounds"
+    }, 
+    "soundStartVolume": {
+        "type": "slider", 
+        "label": "Game Start - Volume", 
+        "value": 35, 
+        "min": 1, 
+        "max": 100, 
+        "ticks": 1, 
+        "tooltip": "Volume for the sound file of Game Start", 
+        "group": "Sounds"
+    }, 
+    "soundVictory": {
+        "type": "textbox", 
+        "value": "Victory.mp3", 
+        "label": "Soundfile for Victory", 
+        "tooltip": "Sound for Victory\r\nImportant: Name is case-sensitive and make sure to add the type behind it (e.g.: Audio.mp3).", 
+        "group": "Sounds"
+    }, 
+    "soundVictoryVolume": {
+        "type": "slider", 
+        "label": "Victory - Volume", 
+        "value": 35, 
+        "min": 1, 
+        "max": 100, 
+        "ticks": 1, 
+        "tooltip": "Volume for the sound file of Victory", 
+        "group": "Sounds"
+    }, 
+    "soundDefeat": {
+        "type": "textbox", 
+        "value": "Defeat.mp3", 
+        "label": "Soundfile for Defeat", 
+        "tooltip": "Sound for Defeat\r\nImportant: Name is case-sensitive and make sure to add the type behind it (e.g.: Audio.mp3).", 
+        "group": "Sounds"
+    }, 
+    "soundDefeatVolume": {
+        "type": "slider", 
+        "label": "Defeat - Volume", 
+        "value": 35, 
+        "min": 1, 
+        "max": 100, 
+        "ticks": 1, 
+        "tooltip": "Volume for the sound file of Defeat", 
+        "group": "Sounds"
+    }, 
+    "btnOpenSoundsFolder": {
+        "type": "button", 
+        "label": "Open the Sounds Folder", 
+        "tooltip": "Click the button to open the Sounds folder.", 
+        "function": "OpenSoundsFolder", 
+        "wsevent": "", 
+        "group": "Sounds"
     }, 
     "bnetUsername1": {
         "type": "textbox", 
@@ -215,145 +305,182 @@
         "tooltip": "Name of your StarCraft II nickname (For each region and no Bnet ID).", 
         "group": "Player Names"
     }, 
+    "cbEnableResponses": {
+        "type": "checkbox",
+        "value": true,
+        "label": "Enable all responses",
+        "tooltip": "If you want to disable all responses in one go, you can do it here.\r\nAlternatively you can remove the text in the response text boxes to not trigger response messages.",
+        "group": "Chat Messages"
+    },      
     "responseBetOpened": {
         "type": "textbox", 
         "value": "$mychannel has joined a new match. Betting is now open.", 
         "label": "Bet has started", 
         "tooltip": "Notification message when a new bet has started (automatically starts when a 1v1 is detected, excluding matches vs AI).\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseBetClosed": {
         "type": "textbox", 
         "value": "Countdown has ended. Betting has now closed.", 
         "label": "Bet has closed", 
         "tooltip": "Notification message when the new bet has closed.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseBetCanceled": {
         "type": "textbox", 
         "value": "Canceling the running bet. Refunding every participant.", 
         "label": "Bet was canceled", 
         "tooltip": "Notification message for the cancel of a running bet. The bets get refunded.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseVictoryCorrectBets": {
         "type": "textbox", 
         "value": "$mychannel has won the game. Total payout of $totalPointsWon: $winnersWithAmount.", 
         "label": "Match won - Had correct bets", 
         "tooltip": "Message when the match was won and people did bet on it.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseVictoryWrongBets": {
         "type": "textbox", 
         "value": "$mychannel has won the game. Noone has gambled correctly, a total of $totalAmountGambled $currencyName have been lost.", 
         "label": "Match won - Had no correct bets", 
         "tooltip": "Message when the match was won and nobody did bet on it.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseVictoryNoBets": {
         "type": "textbox", 
         "value": "$mychannel has won the game. Bet next time to earn some $currencyName!", 
         "label": "Match won - No bets", 
         "tooltip": "Message when the match was won and nobody did bet at all.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseDefeatCorrectBets": {
         "type": "textbox", 
         "value": "$mychannel has lost the game. Total payout of $totalPointsWon: $winnersWithAmount.", 
         "label": "Match lost - Had correct bets", 
         "tooltip": "Message when the match was lost and people did bet on it.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseDefeatWrongBets": {
         "type": "textbox", 
         "value": "$mychannel has lost the game. Noone has gambled correctly, a total of $totalAmountGambled $currencyName have been lost.", 
         "label": "Match lost - Had no correct bets", 
         "tooltip": "Message when the match was lost and nobody did bet on it.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseDefeatNoBets": {
         "type": "textbox", 
         "value": "$mychannel has lost the game. Bet next time to earn some $currencyName!", 
         "label": "Match lost - No bets", 
         "tooltip": "Message when the match was lost and nobody did bet at all.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseHowToUseBetCommand": {
         "type": "textbox", 
         "value": "Write \"$cmdBetWin <amount>\" or \"$cmdBetLose <amount>\" to bet some of your $currencyName!", 
         "label": "Help Command", 
         "tooltip": "Message which gets triggered when a command gets written alone (#win) or when there is no number after the command (#win <nonumber>).\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseNotEnoughPoints": {
         "type": "textbox", 
         "value": "@$user you don\"t seem to have that many $currencyName.", 
         "label": "Not enough Currency", 
         "tooltip": "Message when the user has not as many points as he wants to bet.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseUserJoinedBet": {
         "type": "textbox", 
         "value": "Users successfully joined: $recentlyJoinedUsers", 
         "label": "People who joined the Bet", 
         "tooltip": "Message which posts every user who joined the bet in 3sec intervals (after the last bet).\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseUserAlreadyPlacedBet": {
         "type": "textbox", 
         "value": "@$user you already joined the bet! Wait for the next game to start to make another bet.", 
         "label": "Already placed Bet", 
         "tooltip": "Message when the user tries to bet again during the same match.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseNotCorrectBetAmount": {
         "type": "textbox", 
         "value": "@$user the betting amount has to be between $minBet and $maxBet!", 
         "label": "Invalid Bet Amount", 
         "tooltip": "Message when the user tries to bet something which is not between your set minBet and maxBet amounts.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseStarcraftClosed": {
         "type": "textbox", 
         "value": "StarCraft has ended while a bet was running. Refunding every participant.", 
         "label": "StarCraft II crashed", 
         "tooltip": "Message when StarCraft II crashed. The points will be refunded.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "responseTwoMatchingNames": {
         "type": "textbox", 
         "value": "Bet has failed to start because both players are in $mychannel's list of StarCraft player names.", 
         "label": "Both names are found in the SC2 Accounts", 
         "tooltip": "Message when both players have the same name or the opponent has a name from your Player Names list.\r\nFor all parameters, check out the spreadsheet overview (shortcut file in the Folder).", 
-        "group": "Responses"
+        "group": "Chat Messages"
     }, 
     "devEnableVsAi": {
         "type": "checkbox", 
         "value": false, 
         "label": "Enable the Betting vs. AI", 
         "tooltip": "Enable this if you want to test your betting vs. AI - Careful since bets are still live!", 
-        "group": "Configure Options (For Setup not live usage)"
+        "group": "Configuration Options"
     }, 
     "devAllowMultipleEntries": {
         "type": "checkbox", 
         "value": false, 
         "label": "Allow multiple entries", 
         "tooltip": "Enable if you are testing if multiple entries work for betting and voting system!\r\nWARNING: This is not a feature, this can lead to unpredictable errors, e.g. charging betting users double the amount, ignoring their 2nd and 3rd (and so on) bet, multiple payout might not be working.", 
-        "group": "Configure Options (For Setup not live usage)"
+        "group": "Configuration Options"
     }, 
     "devShowOverlay": {
         "type": "checkbox", 
         "value": false, 
         "label": "Show Overlay all the time", 
         "tooltip": "Enable this if you want to keep the overlay visible to adjust it for stream.", 
-        "group": "Configure Options (For Setup not live usage)"
-    },
+        "group": "Configuration Options"
+    }, 
     "btnTestOverlay": {
         "type": "button", 
         "label": "Run a demo Bet (Overlay only)", 
         "tooltip": "Click the button to run a whole Bet per overlay only to test your settings and labels.\r\nThis runs a complete Bet and takes about 20 seconds: Start, Update, (Hide,) Winner announcement, Hide", 
         "function": "TestOverlay", 
         "wsevent": "", 
-        "group": "Configure Options (For Setup not live usage)"
+        "group": "Configuration Options"
+    }, 
+    "devDebugLogging": {
+        "type": "checkbox", 
+        "value": true, 
+        "label": "Enable Logging", 
+        "tooltip": "Logs the whole process into daily log files in the \"Logs\" subfolder in case you're running into trouble you can send those to the developers to get looked at.", 
+        "group": "Configuration Options"
+    }, 
+    "btnOpenLogFolder": {
+        "type": "button", 
+        "label": "Open Logs Folder", 
+        "tooltip": "Click the button to open the Logs folder.", 
+        "function": "OpenLogFolder", 
+        "wsevent": "", 
+        "group": "Configuration Options"
+    }, 
+    "btnGoToVariables": {
+        "type": "button", 
+        "label": "Overview of all variables", 
+        "tooltip": "This button will redirect you to WellBrained's website to see an overview of all usable variables in the textfields.", 
+        "function": "OpenVariables", 
+        "wsevent": "", 
+        "group": "Configuration Options"
+    }, 
+    "gamingPcIp": {
+        "type": "textbox", 
+        "value": "", 
+        "label": "Gaming PC - IP:Port", 
+        "tooltip": "Leave this field empty if you use a single pc setup!\r\n\r\nIf you are using a dual pc setup enter the gaming pc ip:port in this field.\r\nA step-by-step instruction on how to set it up is within the Readme (click the 'Open Readme.txt' button on top).", 
+        "group": "Configuration Options"
     }
 }

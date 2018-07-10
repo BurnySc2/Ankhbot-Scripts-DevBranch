@@ -20,10 +20,7 @@ if (window.WebSocket) {
   var showWinnerForSec = 3000;
   var setShowWinnerDuration = false;
   var betHidden = false;
-
-  var player1Race;
-  var player2Race;
-
+  var streamerWon;
   var audioStart;
   var audioVictory;
   var audioDefeat;
@@ -42,7 +39,7 @@ if (window.WebSocket) {
   function Connect() {
     socket = new WebSocket(serviceUrl);
 
-    socket.onopen = function() {
+    socket.onopen = function () {
       var auth = {
         author: 'Brain',
         website: 'http://www.twitch.tv/wellbrained',
@@ -59,10 +56,10 @@ if (window.WebSocket) {
         ]
       };
       socket.send(JSON.stringify(auth));
-      console.log("Theme 'SC2ScoreBoard' Connected");
+      console.log("Theme 'GSL' Connected");
     };
 
-    socket.onmessage = function(message) {
+    socket.onmessage = function (message) {
       var jsonObject = JSON.parse(message.data);
 
       if (jsonObject.event == 'EVENT_BET_START') {
@@ -84,15 +81,15 @@ if (window.WebSocket) {
         ShowBet();
       }
     };
-    socket.onerror = function(error) {
+    socket.onerror = function (error) {
       console.log('Error: ' + error);
     };
 
-    socket.onclose = function() {
+    socket.onclose = function () {
       console.log('Connection Closed!');
       HideBet();
       socket = null;
-      setTimeout(function() {
+      setTimeout(function () {
         connectWebsocket();
       }, 5000);
     };
@@ -105,6 +102,8 @@ if (window.WebSocket) {
     console.log('Start new Bet');
     console.log(jsonObject);
 
+    hideOverlayAfterClosing = jsonObject.hideAfterBetClosed;
+
     if (jsonObject.enabledSounds) {
       SetSounds(jsonObject);
     } else {
@@ -113,41 +112,34 @@ if (window.WebSocket) {
       audioDefeat = null;
     }
 
-    hideOverlayAfterClosing = jsonObject.hideAfterBetClosed;
-    if (!setShowWinnerDuration) {
-      // Set duration timer for winner
-      setShowWinnerDuration = true;
-      showWinnerForSec = jsonObject.durationShowWinner;
-    }
-
-    player1Race = jsonObject.race1;
-    player2Race = jsonObject.race2;
-
-    $('#player1').addClass(jsonObject.race1);
-    $('#player2').addClass(jsonObject.race2);
-
-    $('#player1').html(`<div id="p1Name">${jsonObject.player1}</div>`);
-    $('#player2').html(`<div id="p2Name">${jsonObject.player2}</div>`);
-
     if (jsonObject.capitalizeNames) {
-      $('#p1Name').css('text-transform', 'uppercase');
-      $('#p2Name').css('text-transform', 'uppercase');
+      $('.name').css('text-transform', 'uppercase');
     }
 
-    $('#p1Label').text(`${jsonObject.chatCmdWin}`);
-    $('#p2Label').text(`${jsonObject.chatCmdLose}`);
+    $('#player1 .name').html(
+      `<span class='race ${jsonObject.race1}'></span>${jsonObject.player1}`
+    );
+    $('#player2 .name').html(
+      `<span class='race ${jsonObject.race2}'></span>${jsonObject.player2}`
+    );
 
+    $('#player1 .bets').text(`${jsonObject.chatCmdWin}`);
+    $('#player2 .bets').text(`${jsonObject.chatCmdLose}`);
+
+    // Decide percentage or total amount
     if (jsonObject.isPercentageBased) {
-      $('#p1BetBox').html(`${jsonObject.totalWin} %`);
-      $('#p2BetBox').html(`${jsonObject.totalLose} %`);
+      $('#stat-left span').html(`${jsonObject.totalWin} %`);
+      $('#stat-right span').html(`${jsonObject.totalLose} %`);
     } else {
-      $('#p1BetBox').html(`${jsonObject.totalWin}`);
-      $('#p2BetBox').html(`${jsonObject.totalLose}`);
+      $('#stat-left span').html(`${jsonObject.totalWin} ${jsonObject.lblCurr}`);
+      $('#stat-right span').html(
+        `${jsonObject.totalLose} ${jsonObject.lblCurr}`
+      );
     }
 
     if (audioStart != null) {
       audioStart.play();
-      console.log('Start sound played');
+      console.log("Start sound played");
     }
     ShowBet();
   }
@@ -158,96 +150,102 @@ if (window.WebSocket) {
     console.log(jsonObject);
 
     if (jsonObject.isPercentageBased) {
-      $('#p1BetBox').html(`${jsonObject.totalWin} %`);
-      $('#p2BetBox').html(`${jsonObject.totalLose} %`);
+      $('#stat-left span').html(`${jsonObject.totalWin} %`);
+      $('#stat-right span').html(`${jsonObject.totalLose} %`);
     } else {
-      $('#p1BetBox').html(`${jsonObject.totalWin}`);
-      $('#p2BetBox').html(`${jsonObject.totalLose}`);
+      $('#stat-left span').html(`${jsonObject.totalWin} ${jsonObject.lblCurr}`);
+      $('#stat-right span').html(
+        `${jsonObject.totalLose} ${jsonObject.lblCurr}`
+      );
     }
   }
 
   function StreamerWins() {
     console.log('Streamer won');
-    // When hidden add a second for the FadeIn Animation
-    if (betHidden) {
-      ShowBet();
-      showWinnerForSec = showWinnerForSec + 1000;
-    }
+    streamerWon = true;
+
+    ShowBet();
 
     if (audioVictory != null) {
       audioVictory.play();
-      console.log('Victory sound played');
+      console.log("Victory sound played");
     }
 
-    $('#p1Name').addClass('winner animated pulse infinite');
-    setTimeout(function() {
+    setTimeout(function () {
       CloseBet();
-    }, showWinnerForSec);
+    }, showWinnerForSec + 5000);
   }
 
   function StreamerLoses() {
     console.log('Streamer lost');
-    // When hidden add a second for the FadeIn Animation
-    if (betHidden) {
-      ShowBet();
-      showWinnerForSec = showWinnerForSec + 1000;
-    }
+    streamerWon = false;
+    ShowBet();
 
     if (audioDefeat != null) {
       audioDefeat.play();
-      console.log('Defeat sound played');
+      console.log("Defeat sound played");
     }
 
-    $('#p2Name').addClass('winner animated pulse infinite');
-    setTimeout(function() {
+    setTimeout(function () {
       CloseBet();
-    }, showWinnerForSec);
+    }, showWinnerForSec + 5000);
   }
 
   function ShowBet() {
     console.log('Show Bet');
     var tl = new TimelineLite();
-    tl.fromTo('#container', 2, { top: -75 }, { top: 0 });
+    tl.to('#container', 2, {
+      top: 0
+    });
+
+    console.log('StreamerWon: ' + streamerWon);
+    if (typeof streamerWon === 'boolean' && streamerWon) {
+      $('#stat-left span').html('WINNER');
+      $('#stat-right').css('opacity', 0);
+    }
+    if (typeof streamerWon === 'boolean' && !streamerWon) {
+      $('#stat-right span').html('WINNER');
+      $('#stat-left').css('opacity', 0);
+    }
+    tl.to('#stats', 2, {
+      top: 5
+    });
   }
 
   function HideBet() {
     console.log('Hide Bet');
     var tl = new TimelineLite();
-    tl.fromTo('#container', 2, { top: 0 }, { top: -75 });
+    tl.to('#stats', 2, {
+      top: -40
+    });
+    tl.to('#container', 2, {
+      top: -125
+    });
     betHidden = true;
   }
 
   function CloseBet() {
     console.log('Close Bet completely');
-
     HideBet();
-
-    setShowWinnerDuration = false;
-
-    $('#p1Name').removeClass('winner animated pulse infinite');
-    $('#p2Name').removeClass('winner animated pulse infinite');
-
-    $('#player1').removeClass(player1Race);
-    $('#player2').removeClass(player2Race);
   }
 
   function SetSounds(data) {
-    var audioPath = '../../Sounds/';
-    console.log('SetSounds' + data);
+    var audioPath = "../../Sounds/";
+    console.log("SetSounds" + data);
 
-    if (data.soundStart != '') {
+    if (data.soundStart != "") {
       audioStart = new Audio(audioPath + data.soundStart);
       console.log(data.volumeStart * 0.01);
       audioStart.volume = data.volumeStart * 0.01;
     }
-    if (data.soundVictory != '') {
+    if (data.soundVictory != "") {
       audioVictory = new Audio(audioPath + data.soundVictory);
       audioVictory.volume = data.volumeVictory * 0.01;
     }
-    if (data.soundDefeat != '') {
+    if (data.soundDefeat != "") {
       audioDefeat = new Audio(audioPath + data.soundDefeat);
       audioDefeat.volume = data.volumeDefeat * 0.01;
     }
-    console.log('Sounds set');
+    console.log("Sounds set");
   }
 }
