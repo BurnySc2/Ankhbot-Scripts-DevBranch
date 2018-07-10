@@ -1,6 +1,23 @@
 ﻿{
     "output_file": "settings.json",
 
+
+    "openReadMe": {
+        "type": "button",
+        "label": "Open Readme.txt",
+        "tooltip": "Opens the 'Readme.txt' for this script.",
+        "function": "OpenReadMe",
+        "wsevent": "",
+        "group": ""
+    },
+    "openOverlayFolder": {
+        "type": "button",
+        "label": "Open Overlay Files Folder",
+        "tooltip": "Opens the folder where you can find the Uptime.txt and Countdown.txt file that can be included in your overlay.",
+        "function": "BtnOpenOverlayFolder",
+        "wsevent": "",
+        "group": ""
+    },
     "cdInterval": {
         "type": "slider",
         "label": "Countdown in minutes",
@@ -9,36 +26,35 @@
         "max": 90,
         "ticks": 1,
         "tooltip": "Time from where it counts down.",
-        "group": "Countdown"
+        "group": ""
     },
     "cdTimeFormat": {
         "type": "textbox",
         "value": "$mm$:$ss$",
         "label": "Time Format",
         "tooltip": "Set the format of your Countdown here. Available variables:
-        $autoFormat$ = Removes all unnecessary '0' values (5:33)
-        $hh$ = Hours with '0' (05 hours)
-        $h$ = Hours without extra '0' (5 hours, 15 hours)
-        $mm$ = Minutes with '0' (05 minutes)
-        $m$ = Minutes without extra '0' (5 minutes, 15 minutes)
-        $ss$ = Seconds with '0' (05 seconds)
-        $s$ = Seconds without extra '0' (5 seconds, 15 seconds)",
-        "group": "Countdown"
+                    $autoFormat$ = Removes all unnecessary '0' values (5:33)
+                    $hh$ = Hours with '0' (05 hours)
+                    $h$ = Hours without extra '0' (5 hours, 15 hours)
+                    $mm$ = Minutes with '0' (05 minutes)
+                    $m$ = Minutes without extra '0' (5 minutes, 15 minutes)
+                    $ss$ = Seconds with '0' (05 seconds)
+                    $s$ = Seconds without extra '0' (5 seconds, 15 seconds)",
+        "group": ""
     },
     "cdCustomText": {
         "type": "textbox",
         "value": "Starting soon",
         "label": "Custom Text after Countdown",
         "tooltip": "This text will be used after the Countdown is finished",
-        "group": "Countdown"
+        "group": ""
     },
     "cdSetCountdown": {
         "type": "textbox",
         "value": "!countdown",
         "label": "Set countdown chat command",
-        "tooltip": "This command will be used when setting a new countdown via twitch chat command.
-E.g. writing \"!countdown 300\" will set and start a new countdown from 5:00",
-        "group": "Countdown"
+        "tooltip": "This command will be used when setting a new countdown via twitch chat command. E.g. writing \"!countdown 300\" will set and start a new countdown from 5:00",
+        "group": ""
     },
     "cdShowCountdownResponse": {
         "type": "checkbox",
@@ -49,23 +65,15 @@ E.g. writing \"!countdown 300\" will set and start a new countdown from 5:00",
         \"!countdown 300\"
         the response message would be
         \"New countdown set to 5:00\"",
-        "group": "Countdown"
+        "group": ""
     },
     "btnCdStart": {
         "type": "button",
-        "label": "Start Countdown",
+        "label": "Reset & Start Countdown",
         "tooltip": "Starts the Countdown!",
         "function": "StartCountdown",
         "wsevent": "",
-        "group": "Countdown"
-    },
-    "btnCdRestart": {
-        "type": "button",
-        "label": "Reset Countdown",
-        "tooltip": "Resets the Countdown!",
-        "function": "ResetCountdown",
-        "wsevent": "",
-        "group": "Countdown"
+        "group": ""
     },
 
     "customUptimeText": {

@@ -18,8 +18,8 @@ debuggingMode = True
 ScriptName = "StreamTimers"
 Website = "http://www.brains-world.eu"
 Description = "Uptime & Countdown with UI Interface"
-Creator = "Brain"
-Version = "1.1.2"
+Creator = "Brain & Burny"
+Version = "1.1.4"
 
 configFile = "settings.json"
 path = os.path.dirname(__file__)
@@ -27,7 +27,8 @@ timeFromLastTick = time.time()
 countdown = {
     "oldCountdownText": "",
     "countdownText": "",
-    "countdownFileName": "..\..\Files\Countdown.txt",
+    "countdownFileName": "Overlay\Countdown.txt",
+    "countdownJsonFileName": "Countdown.json",
     "currentCountdownTime": 0,
     "countdownIsRunning": False,
 }
@@ -42,7 +43,7 @@ cdVariables = {
 uptime = {
     "oldUptimeText": "",
     "uptimeText": "",
-    "uptimeFileName": "..\..\Files\Uptime.txt",
+    "uptimeFileName": "Overlay\Uptime.txt",
     "uptimeJsonFileName": "Uptime.json",
     "currentUptime": 0,
     "twitchApiResponseOffline": 0,
@@ -69,6 +70,21 @@ threadsKeepAlive = True
 def Init():
     global configFile, path, settings, uptimeThreadActive, uptime, utVariables
     path = os.path.dirname(__file__)
+
+    # create subfolder if it doesnt exist
+    if not os.path.exists(os.path.dirname(os.path.join(path, countdown["countdownFileName"]))):
+        os.makedirs(os.path.dirname(os.path.join(path, countdown["countdownFileName"])))
+    # if not os.path.exists(os.path.dirname(os.path.join(path, uptime["uptimeFileName"]))):
+    #     os.makedirs(os.path.dirname(os.path.join(path, uptime["uptimeFileName"])))
+
+    # create overlay files if they dont exist
+    if not os.path.exists(os.path.join(path, countdown["countdownFileName"])):
+        with open(os.path.join(path, countdown["countdownFileName"]), "w+") as f:
+            f.write(" ")
+    if not os.path.exists(os.path.join(path, uptime["uptimeFileName"])):
+        with open(os.path.join(path, uptime["uptimeFileName"]), "w+") as f:
+            f.write(" ")
+
     try:
         with codecs.open(os.path.join(path, configFile), encoding='utf-8-sig', mode='r') as file:
             settings = json.load(file, encoding='utf-8-sig')
@@ -82,11 +98,22 @@ def Init():
             "maxSleepTimer": 10.0,
         }
 
+
+    # load countdown from json file
+    try:
+        path = os.path.dirname(__file__)
+        with codecs.open(os.path.join(path, countdown["countdownJsonFileName"]), encoding='utf-8-sig', mode='r') as file:
+            countdown["currentCountdownTime"] = json.load(file, encoding='utf-8-sig')["currentCountdownTime"]
+            if countdown["currentCountdownTime"] > 0:
+                StartCountdown()
+    except:
+        pass
+
+    # load uptime from json file
     try:
         path = os.path.dirname(__file__)
         with codecs.open(os.path.join(path, uptime["uptimeJsonFileName"]), encoding='utf-8-sig', mode='r') as file:
-            uptime["currentUptime"] = json.load(
-                file, encoding='utf-8-sig')["currentUptime"]
+            uptime["currentUptime"] = json.load(file, encoding='utf-8-sig')["currentUptime"]
     except:
         pass
 
@@ -94,6 +121,7 @@ def Init():
         uptime["currentUptime"] = 0
         SetUptimeVariables()
         WriteUptimeToFile()
+
     return
 
 
@@ -108,7 +136,8 @@ def Execute(data):
         if data.GetParamCount() == 2 and data.GetParam(0).lower() == settings["cdSetCountdown"].lower():
             if Parent.HasPermission(data.User, "Caster", ""):
                 try:
-                    countdown["currentCountdownTime"] = int(data.GetParam(1)) * 60
+                    countdown["currentCountdownTime"] = int(
+                        data.GetParam(1)) * 60
                     if not countdown["countdownIsRunning"]:
                         StartCountdown()
                     if settings["cdShowCountdownResponse"]:
@@ -145,18 +174,17 @@ def ReloadSettings(jsonData):
 
 def StartCountdown():
     global countdown, settings, countdownThreadActive
-    countdown["countdownIsRunning"] = True
-    if not countdownThreadActive:
-        threading.Thread(target=CountdownThread, args=()).start()
 
-
-def ResetCountdown():
-    global countdown, settings
     countdown["currentCountdownTime"] = settings["cdInterval"] * 60
-    countdown["countdownIsRunning"] = False
     countdown["oldCountdownText"] = " "
     with codecs.open(os.path.join(path, countdown["countdownFileName"]), encoding='utf-8-sig', mode='w+') as file:
         file.write(" ")
+    with codecs.open(os.path.join(path, countdown["countdownJsonFileName"]), encoding='utf-8-sig', mode='w+') as file:
+        json.dump({"currentCountdownTime": 0}, file)
+
+    countdown["countdownIsRunning"] = True
+    if not countdownThreadActive:
+        threading.Thread(target=CountdownThread, args=()).start()
 
 
 def CountdownThread():
@@ -188,8 +216,12 @@ def CountdownThread():
             countdown["countdownIsRunning"] = False
 
         if countdown["oldCountdownText"] != countdown["countdownText"]:
+            # write countdown to overlay file
             with codecs.open(os.path.join(path, countdown["countdownFileName"]), encoding='utf-8-sig', mode="w+") as file:
                 file.write(countdown["countdownText"])
+            # write countdown to json file in case of "reload scripts" or streamlabs chatbot is shut down
+            with codecs.open(os.path.join(path, countdown["countdownJsonFileName"]), encoding='utf-8-sig', mode='w+') as file:
+                json.dump({"currentCountdownTime": countdown["currentCountdownTime"]}, file)
             countdown["oldCountdownText"] = countdown["countdownText"]
         time.sleep(1)
     countdownThreadActive = False
@@ -319,7 +351,6 @@ def ScriptToggled(state):
         threadsKeepAlive = True
     # if the script gets disabled, stop all timers and resets the textfiles
     else:
-        ResetCountdown()
         ResetUptime()
         uptime["twitchApiResponseOffline"] = 0
         Unload()
@@ -329,6 +360,18 @@ def ScriptToggled(state):
 def Unload():
     global threadsKeepAlive
     threadsKeepAlive = False
+    return
+
+def OpenReadMe():
+    """Open the readme.txt in the scripts folder"""
+    location = os.path.join(os.path.dirname(__file__), "README.txt")
+    os.startfile(location)
+    return
+
+def BtnOpenOverlayFolder():
+    """Open the folder where the user can find the index.html"""
+    location = os.path.join(os.path.dirname(__file__), "Overlay")
+    os.startfile(location)
     return
 
 
