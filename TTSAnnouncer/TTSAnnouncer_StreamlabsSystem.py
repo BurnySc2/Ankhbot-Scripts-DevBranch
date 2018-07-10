@@ -19,7 +19,7 @@ import os
 ScriptName = "TTS Announcer"
 Website = "https://burnysc2.github.io"
 Creator = "Brain & Burny"
-Version = "1.0.5"
+Version = "1.1.2"
 Description = "Text-to-Speech Announcer"
 
 #---------------------------------------
@@ -32,8 +32,8 @@ settings = {}
 convertPowerLevelToInt = {
 	"Everyone": 0,
 	"Regular": 1,
-	"Sub": 2,
-	"Mod": 3,
+	"Subscriber (Twitch) / Sponsor (Youtube)": 2,
+	"Mod": -1,
 	"Streamer": 4,
 }
 
@@ -57,6 +57,7 @@ tts = {
 	"generateKeyButtonClicked": 0,
 	"pathUniqueKey": os.path.join(os.path.dirname(__file__), "uniqueKey.json"),
 	"uniqueKey": "",
+	"userName": "",
 }
 
 # https://warp.world/scripts/tts-message
@@ -138,7 +139,7 @@ def Init():
 		# settings["randomKey"] = settings["randomKey"].strip() #removes whitespace left and right
 		settings["powerLevelInt"] = convertPowerLevelToInt[settings["minPowerLevel"]]
 		settings["volume"] = int(settings.get("volume", 25))
-		settings["blackWordFilter"] = settings["blackWordFilter"].replace(" ","").split(",")
+		settings["blackWordFilter"] = settings["blackWordFilter"].strip(",").replace(" ","").split(",")
 		if settings["blackWordFilter"] == [""]:
 			settings["blackWordFilter"] = []
 		# settings["userPointsCost"] = max(0, settings["userPointsCost"])
@@ -150,7 +151,7 @@ def Init():
 			if settings.get("language" + key, False):
 				settings["enabledVoices"][key] = value
 
-		responseVariables["$streamer"] = Parent.GetDisplayName(Parent.GetChannelName())
+		responseVariables["$streamer"] = Parent.GetChannelName()
 		responseVariables["$currencyName"] = Parent.GetCurrencyName()
 		responseVariables["$pointsCost"] = settings["userPointsCost"]
 		responseVariables["$maxUserQueue"] = settings["userMaxQueues"]
@@ -159,15 +160,15 @@ def Init():
 		responseVariables["$characterLimit"] = settings["userMaxMessageLength"]
 		responseVariables["$helpCommand"] = settings["helpCommand"]
 		settings["settingsLoaded"] = True
-	except: 
-		pass
+	except Exception as e: 
+		Parent.Log("TTS Announcer", "Error while loading config file: {}".format(e))
 
-	try:
+	if os.path.isfile(tts["pathUniqueKey"]):
 		with codecs.open(tts["pathUniqueKey"], encoding='utf-8-sig', mode='r') as file:
 			tts["uniqueKey"] = json.load(file)["uniqueKey"]
-	except: 
+	else:
+		# no uniquekey exists (yet)
 		tts["uniqueKey"] = ""
-		pass
 		
 	return
 
@@ -186,7 +187,10 @@ def Execute(data):
 	
 	# if settings["enabledTTS"]:
 	if settings.get("settingsLoaded", False):
-		if data.IsChatMessage():
+		if data.IsChatMessage() and \
+			(data.GetParamCount() >= 1 and data.GetParam(0).lower().startswith(settings["command"].lower())) or \
+			data.GetParamCount() >= 1 and data.GetParam(0).lower().startswith(settings["helpCommand"].lower()):
+
 			responseVariables["$user"] = Parent.GetDisplayName(data.User)
 			responseVariables["$userPoints"] = Parent.GetPoints(data.User)
 			
@@ -210,7 +214,7 @@ def Execute(data):
 				# 	languages += ", "
 				languages = languages.rstrip(" ").rstrip(",")
 				for i in range(len(languages) // 490 + 1):
-					Parent.SendTwitchMessage(languages[i*490:490*(i+1)])
+					Parent.SendStreamMessage(languages[i*490:490*(i+1)])
 
 			elif settings["command"].lower() in data.GetParam(0).lower():
 				message = " ".join(data.Message.split(" ")[1:])
@@ -218,16 +222,21 @@ def Execute(data):
 				# applies black list word filter - message will be purged if it contains a bad word
 				for word in settings["blackWordFilter"]:
 					if word.lower() in message.lower():
-						Parent.SendTwitchMessage("/timeout {} 1 TTS Announcer: Message contains a bad word.".format(data.User))
+						SendMessage(settings["responseMessageDoesntPassFilter"])
+						# Parent.SendStreamMessage("/timeout {} 1 TTS Announcer: Message contains a bad word.".format(data.User))
 						return
 
 				# check power levels - everyone, regular, sub, mod, streamer
 				userPowerLevel = 0
 				userPowerLevel = 1 if Parent.HasPermission(data.User, "regular", "") else userPowerLevel
 				userPowerLevel = 2 if Parent.HasPermission(data.User, "subscriber", "") else userPowerLevel
-				userPowerLevel = 3 if Parent.HasPermission(data.User, "moderator", "") else userPowerLevel
+				# userPowerLevel = 3 if Parent.HasPermission(data.User, "moderator", "") else userPowerLevel
 				userPowerLevel = 4 if Parent.HasPermission(data.User, "caster", "") else userPowerLevel
-				if settings["powerLevelInt"] > userPowerLevel:
+				if userPowerLevel >= settings["powerLevelInt"] or \
+					Parent.HasPermission(data.User, "moderator", "") and settings["allowModsToUse"]:
+
+					pass
+				else:
 					Parent.Log("TTS Announcer", "A request has been declined because the user does not have high enough power level.")
 					return
 
@@ -241,35 +250,39 @@ def Execute(data):
 					SendMessage(settings["responseMessageTooLong"])
 					return
 				
-				# global TTS queue cooldown is active
-				globalLastUsage = tts.get("globalCooldownUntil", 1)	
-				if ConvertDatetimeToEpoch(datetime.datetime.now()) < globalLastUsage:
-					responseVariables["$waitSeconds"] = int(globalLastUsage - ConvertDatetimeToEpoch(datetime.datetime.now()))
-					SendMessage(settings["responseGlobalQueueActive"])
-					return
+				# if user is broadcaster and broadcaster godmode is active
+				if settings["casterGodMode"] and Parent.HasPermission(data.User, "caster", ""):
+					pass 
+				else:
+					# global TTS queue cooldown is active
+					globalLastUsage = tts.get("globalCooldownUntil", 1)	
+					if ConvertDatetimeToEpoch(datetime.datetime.now()) < globalLastUsage:
+						responseVariables["$waitSeconds"] = int(globalLastUsage - ConvertDatetimeToEpoch(datetime.datetime.now()))
+						SendMessage(settings["responseGlobalQueueActive"])
+						return
 
-				# too many entries in global TTS queue
-				if len(tts["queue"]) >= settings["globalMaxQueues"]:
-					SendMessage(settings["responseGloballyTooManyInQueue"])
-					return
+					# too many entries in global TTS queue
+					if len(tts["queue"]) >= settings["globalMaxQueues"]:
+						SendMessage(settings["responseGloballyTooManyInQueue"])
+						return
 
-				# user has to wait to use TTS again
-				lastUsage = users.get(data.User, 1)	
-				if ConvertDatetimeToEpoch(datetime.datetime.now()) < lastUsage:
-					responseVariables["$waitSeconds"] = int(lastUsage - ConvertDatetimeToEpoch(datetime.datetime.now()))
-					SendMessage(settings["responseUserSpamming"])
-					return
+					# user has to wait to use TTS again
+					lastUsage = users.get(data.User, 1)	
+					if ConvertDatetimeToEpoch(datetime.datetime.now()) < lastUsage:
+						responseVariables["$waitSeconds"] = int(lastUsage - ConvertDatetimeToEpoch(datetime.datetime.now()))
+						SendMessage(settings["responseUserSpamming"])
+						return
 
-				# user has too many TTS in queue
-				if len(messagesOfUser) >= settings["userMaxQueues"]:
-					SendMessage(settings["responseUserTooManyInQueue"])
-					return
+					# user has too many TTS in queue
+					if len(messagesOfUser) >= settings["userMaxQueues"]:
+						SendMessage(settings["responseUserTooManyInQueue"])
+						return
 
 
-				# if user doesnt have enough points
-				if Parent.GetPoints(data.User) < settings["userPointsCost"]:
-					SendMessage(settings["responseUserNotEnoughPoints"])
-					return
+					# if user doesnt have enough points
+					if Parent.GetPoints(data.User) < settings["userPointsCost"]:
+						SendMessage(settings["responseUserNotEnoughPoints"])
+						return
 				
 				# try to find voice
 				voiceFound = False
@@ -286,9 +299,14 @@ def Execute(data):
 					SendMessage(settings["responseUserLanguageNotFound"])
 					return
 
-				users[data.User] = ConvertDatetimeToEpoch(datetime.datetime.now()) + int(settings["userCooldown"]) # set last usage to "now"
-				tts["globalCooldownUntil"] = ConvertDatetimeToEpoch(datetime.datetime.now()) + int(settings["globalCooldown"]) # set last usage to "now"
-				Parent.RemovePoints(data.User, settings["userPointsCost"])
+				# if user is broadcaster and broadcaster godmode is active
+				if settings["casterGodMode"] and Parent.HasPermission(data.User, "caster", ""):
+					pass 
+				else:
+					users[data.User] = ConvertDatetimeToEpoch(datetime.datetime.now()) + int(settings["userCooldown"]) # set last usage to "now"
+					tts["globalCooldownUntil"] = ConvertDatetimeToEpoch(datetime.datetime.now()) + int(settings["globalCooldown"]) # set last usage to "now"
+					Parent.RemovePoints(data.User, data.UserName, settings["userPointsCost"])
+
 				tts["queue"].append({
 					"user": data.User,
 					"voice": voice.replace(" ", "%20"),
@@ -342,10 +360,14 @@ def GenerateAndWhisperKey():
 			# Parent.Log("TTS", "response: {}".format(newLink))
 			key = newLink.split("/")[-2]
 			tts["uniqueKey"] = key
-			with codecs.open(tts["pathUniqueKey"], encoding='utf-8-sig', mode='w+') as file:
-				json.dump({"uniqueKey": key}, file)
+			try:
+				with codecs.open(tts["pathUniqueKey"], encoding='utf-8-sig', mode='w+') as file:
+					json.dump({"uniqueKey": key}, file)
+			except Exception as e: 
+				Parent.Log("TTSAnnouncer", "Could not write uniqueKey.json to file. Error: {}".format(e))
+
 			# Parent.Log("TTS", "key: {}".format(key))
-			Parent.SendTwitchWhisper(Parent.GetChannelName(), "OBS Browser Source URL: {}".format(newLink))
+			Parent.SendStreamWhisper(Parent.GetChannelName(), "OBS Browser Source URL: {}".format(newLink))
 
 
 def OpenWebsiteForBrowserSource():
@@ -357,8 +379,11 @@ def OpenWebsiteForBrowserSource():
 			newLink = response["response"]
 			key = newLink.split("/")[-2]
 			tts["uniqueKey"] = key
-			with codecs.open(tts["pathUniqueKey"], encoding='utf-8-sig', mode='w+') as file:
-				json.dump({"uniqueKey": key}, file)				
+			try:
+				with codecs.open(tts["pathUniqueKey"], encoding='utf-8-sig', mode='w+') as file:
+					json.dump({"uniqueKey": key}, file)	
+			except Exception as e: 
+				Parent.Log("TTSAnnouncer", "Could not write uniqueKey.json to file. Error: {}".format(e))			
 			os.startfile(newLink)
 
 #---------------------------------------
@@ -385,6 +410,6 @@ def SendMessage(string):
 			string = string.replace(variable, str(int(text)))
 		else:
 			string = string.replace(variable, str(text))
-	Parent.SendTwitchMessage(string[:490])
+	Parent.SendStreamMessage(string[:490])
 
 

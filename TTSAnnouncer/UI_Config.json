@@ -23,10 +23,16 @@
         "items": [
             "Everyone",
             "Regular",
-            "Sub",
-            "Mod",
+            "Subscriber (Twitch) / Sponsor (Youtube)",
             "Streamer"
         ],
+        "group": ""
+    },
+    "allowModsToUse": {
+        "type": "checkbox",
+        "value": false,
+        "label": "Mods are allowed to use TTS",
+        "tooltip": "Mods have been seperated from the \"Min Power Level\" and now have their own checkbox. If enabled, mods are allowed to use TTS.",
         "group": ""
     },
     "userPointsCost": {
@@ -58,6 +64,13 @@
             "UK English Female",
             "US English Female"
         ],
+        "group": ""
+    },
+    "casterGodMode": {
+        "type": "checkbox",
+        "value": false,
+        "label": "Broadcaster has no cooldown/cost",
+        "tooltip": "If enabled, if the broadcaster uses !tts, the script will ignore checks for points and cooldown and will not remove points and cooldown of the broadcaster.",
         "group": ""
     },
     "userCooldown": {
@@ -279,6 +292,13 @@
         "value": "@$user you have reached the limit of $maxQueue queue entries.",
         "label": "Too many TTS in queue",
         "tooltip": "Error message in chat when the user has reached the max amount of messages.",
+        "group": "Error Responses"
+    },
+    "responseMessageDoesntPassFilter": {
+        "type": "textbox",
+        "value": "@$user your message didn't pass the black word filter.",
+        "label": "Message didn't pass black word filter",
+        "tooltip": "Error message in chat when the user used a bad word.",
         "group": "Error Responses"
     },
     "responseKeyMissing": {
