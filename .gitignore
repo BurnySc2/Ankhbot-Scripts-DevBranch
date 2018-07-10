@@ -1,5 +1,8 @@
 .vscode/*
 
+# unfinished projects
+SC2StatsTrackTest/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
