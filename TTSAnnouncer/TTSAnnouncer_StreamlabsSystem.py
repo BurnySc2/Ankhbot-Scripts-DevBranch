@@ -19,7 +19,7 @@ import os
 ScriptName = "TTS Announcer"
 Website = "https://burnysc2.github.io"
 Creator = "Brain & Burny"
-Version = "1.1.2"
+Version = "1.1.3"
 Description = "Text-to-Speech Announcer"
 
 #---------------------------------------
@@ -57,7 +57,7 @@ tts = {
 	"generateKeyButtonClicked": 0,
 	"pathUniqueKey": os.path.join(os.path.dirname(__file__), "uniqueKey.json"),
 	"uniqueKey": "",
-	"userName": "",
+	"streamerName": "",
 }
 
 # https://warp.world/scripts/tts-message
@@ -135,6 +135,7 @@ def Init():
 			# "defaultVoice": "US English Female",
 			"playAlert": "false",
 		})
+		tts["streamerName"] = settings["customUserNameForYoutube"] if settings["customUserNameForYoutube"] != "" else Parent.GetChannelName()
 		voices[""] = settings["defaultVoice"]
 		# settings["randomKey"] = settings["randomKey"].strip() #removes whitespace left and right
 		settings["powerLevelInt"] = convertPowerLevelToInt[settings["minPowerLevel"]]
@@ -331,7 +332,7 @@ def Tick():
 				current = tts["queue"].pop(0)
 				if len(current["message"]) != "" and tts["uniqueKey"] != "":
 					response = Parent.GetRequest("https://warp.world/scripts/tts-message?streamer={0}&key={1}&viewer={2}&bar={3}&font={4}&sfont={5}&bfont={6}&gfont={7}&voice={8}&vol={9}&alert=false&message={10}".format(\
-						Parent.GetChannelName(), tts["uniqueKey"], current["user"], settings["messageColor"], settings["fontColor"], settings["fontSize"], settings["fontOutlineColor"],\
+						tts["streamerName"], tts["uniqueKey"], current["user"], settings["messageColor"], settings["fontColor"], settings["fontSize"], settings["fontOutlineColor"],\
 						settings["googleFont"], cgi.escape(current["voice"]), str(settings["volume"]), cgi.escape(current["message"])), {})
 					# Parent.Log("TTS Announcer", "Logging: {}".format(cgi.escape(current["message"])))
 				tts["timeUntilReady"] = len(current["message"]) / 8
@@ -374,7 +375,7 @@ def OpenWebsiteForBrowserSource():
 	global tts
 	if time.time() - tts["generateKeyButtonClicked"] > 10:
 		tts["generateKeyButtonClicked"] = time.time()
-		response = json.loads(Parent.GetRequest("https://warp.world/scripts/tts-user?streamer=" + Parent.GetChannelName(), {}))
+		response = json.loads(Parent.GetRequest("https://warp.world/scripts/tts-user?streamer=" + tts["streamerName"], {}))
 		if response["status"] == 200:
 			newLink = response["response"]
 			key = newLink.split("/")[-2]
@@ -382,7 +383,7 @@ def OpenWebsiteForBrowserSource():
 			try:
 				with codecs.open(tts["pathUniqueKey"], encoding='utf-8-sig', mode='w+') as file:
 					json.dump({"uniqueKey": key}, file)	
-			except Exception as e: 
+			except Exception as e:
 				Parent.Log("TTSAnnouncer", "Could not write uniqueKey.json to file. Error: {}".format(e))			
 			os.startfile(newLink)
 

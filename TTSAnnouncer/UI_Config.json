@@ -315,6 +315,13 @@
         "tooltip": "Error message in chat when the user reached the global limit of messages.",
         "group": "Error Responses"
     },
+    "customUserNameForYoutube": {
+        "type": "textbox",
+        "value": "",
+        "label": "Custom Username (Youtube Only)",
+        "tooltip": "If you are a Youtube streamer and have a space in your channel name, you need to use this field to override your channel name.\r\nJust enter any nickname that does not contain spaces. Then hit \"Save settings\" once.\nNow you are able to use the \"OPEN THE LINK IN MY BROWSER\" button to get your browser source.",
+        "group": "Get a link for your Browser Source"
+    },
     "btnOpenWebsiteNewKey": {
         "type": "button",
         "label": "Open the link in my browser",

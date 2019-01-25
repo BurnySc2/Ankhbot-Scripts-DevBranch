@@ -5,7 +5,7 @@ Description: Text-to-Speech Announcer
 Created by: 
 Brain - www.twitch.tv/wellbrained
 Burny - www.twitch.tv/burnysc2
-Version: 1.1.2
+Version: 1.1.3
 
 
 #################
@@ -63,6 +63,9 @@ Afterwards the list of scripts get reloaded and you can start configuring those.
 ###############
 Version History
 ###############
+1.1.3:
+  ~ Added custom text field for Youtube streamers with space in their channel name
+
 1.1.2:
   ~ fixed a critical error with user permissions (when it was set to sub-only)
   ~ A minor faulty fix in error logging
