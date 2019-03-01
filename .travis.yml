@@ -1,0 +1,32 @@
+
+sudo: required
+language: python
+services: docker
+
+jobs:
+  # Now, the build result will be determined as soon as all the required jobs finish, based on these results, while the rest of the allow_failures jobs continue to run.
+  fast_finish: true
+
+  # Jobs that are being run
+  include:
+    - stage: test python 2.7
+      script:
+        # Pull docker image, this step could be skipped
+        - docker pull python:2.7-slim
+        # Create docker container called "app" from image "python:2.7-slim", the "-alpine" versions have no "bash" installed so you can't do "cd /root/my_folder"
+        - docker run -it -d --name app python:2.7-slim
+        # List contents of current folder
+        - ls
+        # Copy repository files and folders to docker container
+        - docker cp . app:/root/ankhbot
+        # List contents of container
+        - docker exec app ls /root/ankhbot
+        # Upgrade pipenv (and implicitly pip)
+        - docker exec app pip install --upgrade pipenv
+        # Change directory, create pipenv virtual environment and install dev packages from Pipfile for testing
+        # Command origins from here: https://stackoverflow.com/a/28037991/10882657
+        - docker exec -i app bash -c "cd /root/template && pipenv install --dev"
+        # Change directory and run tests
+        - docker exec -i app bash -c "cd /root/template && pipenv run pytest Tests/"
+        # Shut down and remove container
+        - docker rm -f app

@@ -18,7 +18,8 @@ import time
 from collections import defaultdict
 from collections import OrderedDict
 import threading
-import clr
+if __name__ != "__main__":
+    import clr
 import codecs
 import logging
 
@@ -45,26 +46,66 @@ settings = {}
 responseVariables = {}
 apiData = defaultdict(lambda: "")
 messageQueue = []
-bets = {
-    "status": "waitForGame",
-    "gamblers": set(),
-    "bets": [],
-    "totalGambled": 0,
-    "apiCallDone": False,
-    "latestApiUpdateTimestamp": time.time(),
-    "totalGambledWin": 0,
-    "totalGambledLose": 0,
-    "updateRespondJoinedBetInterval": 3,
-    "updateInterval": 2,
-    "timeSinceLastViewerJoinedBet": 0,
-    "timeSinceLastUpdate": time.time(),
-    "recentlyJoinedUsers": [],
-    "noBetsOnlyVotes": False,
-    "duplicateNamesFound": False,
-    "isPercentageBased": False,
-    "capitalizeNames": True,
-    "enableSounds": False
-}
+
+from enum import Enum
+class Status(Enum):
+    open = 1
+    closed = 2
+    waitForMenu = 3
+    waitForGame = 4
+
+class Bets(object):
+    def __init__(self):
+        self.status = Status.waitForGame
+        self.resetBetVariables()
+
+    def resetBets(self):
+        self.gamblers = set() # usernames of people who joined betting
+        self.bets = [] #
+        self.recentlyJoinedUsers = []
+        self.timeSinceLastViewerJoinedBet = 0
+        self.totalGambled = 0
+        self.totalGambledWin = 0
+        self.totalGambledLose = 0
+
+
+class Settings(object):
+    def __init__(self):
+        self.responseInterval = 2
+        self.noBetsOnlyVotes = False
+        self.isPercentageBased = False
+        self.capitalizeNames = True
+        self.enableSounds = False
+
+class Sc2ApiHandling(object):
+    def __init__(self):
+        self.apiCallDone = False
+        self.latestUpdateTimestamp = time.time()
+        self.timeSinceLastUpdate = time.time()
+        self.duplicateNamesFound = False
+
+
+# bets = {
+#     "status": "waitForGame",
+#     "gamblers": set(),
+#     "bets": [],
+#     "totalGambled": 0,
+#     "apiCallDone": False,
+#     "latestApiUpdateTimestamp": time.time(),
+#     "totalGambledWin": 0,
+#     "totalGambledLose": 0,
+#     "updateRespondJoinedBetInterval": 3,
+#     "updateInterval": 2,
+#     "timeSinceLastViewerJoinedBet": 0,
+#     "timeSinceLastUpdate": time.time(),
+#     "recentlyJoinedUsers": [],
+#     "noBetsOnlyVotes": False,
+#     "duplicateNamesFound": False,
+#     "isPercentageBased": False,
+#     "capitalizeNames": True,
+#     "enableSounds": False
+# }
+
 raceLongName = {
     "Z": "zerg",
     "T": "terran",
@@ -76,30 +117,23 @@ def OpenReadMe():
     """Open the readme.txt in the scripts folder"""
     location = os.path.join(os.path.dirname(__file__), "README.txt")
     os.startfile(location)
-    return
 
 def BtnOpenOverlaysFolder():
     """Open the folder where the user can find the index.html"""
     location = os.path.join(os.path.dirname(__file__), "Overlays")
     os.startfile(location)
-    return
-
 
 def OpenLogFolder():
     location = os.path.join(os.path.dirname(__file__), "Logs")
     os.startfile(location)
-    return
-
 
 def OpenVariables():
     os.startfile("http://brains-world.eu/chatbot-starcraft-scripts-variables/")
 
-
 def OpenSoundsFolder():
     location = os.path.join(os.path.dirname(__file__), "Sounds")
     os.startfile(location)
-    return
-    
+
 def Init():
     global responseVariables, settings, configFile, bets, gameUrl, uiUrl
     path = os.path.dirname(__file__)
@@ -838,3 +872,173 @@ def TestOverlayThread():
 def Debug(message):
     if debuggingMode:
         Parent.Log("Betting", message)
+
+
+#---------------------------------------
+#    For standalone betting and debugging
+#---------------------------------------
+
+# Same as StreamlabsChatbot
+class Parent(object):
+    def GetDisplayName(self, dataUser):
+        pass
+    def GetChannelName(self):
+        pass
+    def GetCurrencyName(self):
+        pass
+    def BroadcastWsEvent(self):
+        pass
+    def GetPoints(self, dataUser):
+        pass
+    def AddPoints(self, dataUser):
+        pass
+    def RemovePoints(self, dataUser):
+        pass
+    def Log(self, scriptName, message):
+        pass
+    def SendStreamMessage(self, message): # 490 or 500 character limit
+        pass
+    def GetRequest(self, url, data: dict):
+        pass
+
+# Same as StreamlabsChatbot
+class Data(object):
+    def IsChatMessage(self):
+        pass
+    def UserName(self):
+        pass
+    def User(self):
+        pass
+    def GetParamCount(self):
+        pass
+    def GetParam(self, index):
+        pass
+
+# Emulate a User
+class User(object):
+    def __init__(self, userName, user, points):
+        self.userName = userName
+        self.user = user
+        self.points = points
+
+# Twitch IRC connection
+import socket
+import re
+import json
+
+
+
+
+class Bot(object):
+    """"""
+    def __init__(self, channel, n_msg_per_sec=100):
+        super(Bot, self).__init__()
+        self._nickname = NICK
+        self.channel = channel
+        self.connect(channel)
+        # print(NICK, channel, '\n', '-' * (len(NICK + channel) + 1))
+        print("{} {}\n{}".format(NICK, channel, '-' * (len(NICK + channel) + 1)))
+
+        self._msg_count = 0
+        self.n_msg_per_sec = n_msg_per_sec
+
+    def connect(self, channel):
+        self._socket = socket.socket()
+        self._socket.connect((HOST, PORT))
+        self._socket.send("PASS {}\r\n".format(PASS).encode("utf-8"))
+        self._socket.send("NICK {}\r\n".format(NICK).encode("utf-8"))
+        self._socket.send("JOIN {}\r\n".format(channel).encode("utf-8"))
+
+    def chat(self, msg):
+        self._socket.send("PRIVMSG {} :{}\r\n".format(self.channel, msg))
+
+    def _ping_pong(self, response):
+        if response == "PING :tmi.twitch.tv\r\n":
+            # send pong back to prevent timeout
+            self._socket.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
+            return True
+        else:
+            return False
+
+    def _get_response(self):
+        try:
+            response = self._socket.recv(1024).decode("utf-8")
+        except UnicodeDecodeError as e:
+            print('\n\n%s\n\n' % e)
+            return False
+
+        if self._ping_pong(response):
+            return False
+        elif ':tmi.twitch.tv' in response:
+            return False
+        else:
+            return response
+
+    def _process_msg(self, response):
+        username = re.search(r"\w+", response).group(0)
+        mask = re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
+        message = mask.sub("", response).strip('\r\n')
+        return username, message
+
+    def action(self, username, msg):
+        return NotImplementedError()
+
+    def run(self):
+        while True:
+            response = self._get_response()
+            if response:
+                username, msg = self._process_msg(response)
+                self.action(username, msg)
+
+            time.sleep(1 / float(self.n_msg_per_sec))
+
+
+
+if __name__ == "__main__":
+    # Initialize bot
+    import json, os
+
+
+    # Load normal config files and values set by StreamlabsChatbot
+    if os.path.exists("SC2BetSystemConfig.json"):
+        with open("SC2BetSystemConfig.json") as f:
+            settings = json.load(f)
+    else:
+        # TODO: parse ui_config json and default values
+        with open("UI_Config.json") as f:
+            settings = json.load(f)
+
+    # Load or create standalone config
+    if os.path.exists("SC2BetStandaloneConfig.json"):
+        with open("SC2BetStandaloneConfig.json") as f:
+            standaloneSettings = json.load(f)
+    else:
+        with open("SC2BetStandaloneConfig.json", "w") as f:
+            defaultJson = OrderedDict()
+            defaultJson["name"] = ""
+            defaultJson["pass"] = ""
+            defaultJson["channel"] = ""
+            json.dump(defaultJson, f, indent=4)
+        _ = input(
+"""
+Standalone-config file was not found and has been created.
+Please put in your bot name, password or oauth and which channel to join.
+""")
+
+    HOST = config['HOST']
+    PORT = config['PORT']
+    NICK = config['NICK']
+    PASS = config['PASS']
+    """
+    HOST = "irc.twitch.tv"                          # Hostname of the IRC-Server in this case twitch's
+    PORT = 6667                                     # Default IRC-Port
+    CHAN = "#testing"                               # Channelname = #{Nickname}
+    NICK = "Testing"                                # Nickname = Twitch username
+    PASS = "oauth:asdfg12345asdfg12345asdfg12345"   # www.twitchapps.com/tmi/ will help to retrieve the required authkey
+    """
+
+
+    # Run bot while-loop
+
+    pass
+
