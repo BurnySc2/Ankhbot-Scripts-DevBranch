@@ -17,7 +17,7 @@ Parent = ParentClass()
 
 
 def test_betting_object():
-    bet = Bet()
+    bet = Bet(Parent)
     assert bet.gambler_allowed_to_join("burny", 50)
     assert bet.add_gambler("burny", 50)
     assert not bet.gambler_allowed_to_join("burny", 50)

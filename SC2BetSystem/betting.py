@@ -1,17 +1,16 @@
 import time
 
-Parent = None  # type: ParentClass
-
 
 class Bet(object):
-    def __init__(self):
+    def __init__(self, parent_object):
         # TODO: Add script settings as argument, e.g. min bet amount, max bet amount, win command, lose command, allow multiple entries
         self.min_bet_amount = 0
         self.max_bet_amount = 100
         self.command_win = "win"
         self.command_lose = "lose"
-
         self.allow_multiple_entries = False
+
+        self.parent = parent_object  # type: ParentClass
 
         self.gamblers = set()
         self.bets = []
@@ -22,7 +21,7 @@ class Bet(object):
         self.time_since_last_joined = time.time()
 
     def gambler_allowed_to_join(self, user_id, investment_amount):
-        if Parent.GetPoints(user_id) < investment_amount:
+        if self.parent.GetPoints(user_id) < investment_amount:
             return False
         if user_id in self.gamblers and not self.allow_multiple_entries:
             return False
@@ -37,6 +36,7 @@ class Bet(object):
         if ignore_check or self.gambler_allowed_to_join(user_id, investment_amount):
             self.gamblers.add(user_id)
             self.bets.append([user_id, investment_amount, bet_choice])
-            Parent.RemovePoints(user_id)
+            display_name = self.parent.GetDisplayName(user_id)
+            self.parent.RemovePoints(user_id, display_name, investment_amount)
             return True
         return False
