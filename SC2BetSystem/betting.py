@@ -4,17 +4,17 @@ Parent = None  # type: ParentClass
 
 
 class Bet(object):
-    def __init__(self, parent_object):
-        self.parent = parent_object
+    def __init__(self):
+        # TODO: Add script settings as argument, e.g. min bet amount, max bet amount, win command, lose command, allow multiple entries
         self.min_bet_amount = 0
         self.max_bet_amount = 100
         self.command_win = "win"
         self.command_lose = "lose"
 
+        self.allow_multiple_entries = False
+
         self.gamblers = set()
         self.bets = []
-
-        self.allow_multiple_entries = False
 
         self.total_gambled = 0
         self.total_gambled_win = 0
