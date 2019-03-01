@@ -8,7 +8,7 @@ except:
     from Data import DataClass
     from Parent import ParentClass
 
-from .SC2BetSystem.betting import Bet
+from SC2BetSystem.betting import Bet
 
 # import sys
 # sys.path.append("..")
